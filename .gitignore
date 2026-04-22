@@ -47,8 +47,3 @@ $RECYCLE.BIN/
 **/.venv/
 **/venv/
 
-.sfdx/
-.sf/
-node_modules/
-.vscode/
-.husky/
