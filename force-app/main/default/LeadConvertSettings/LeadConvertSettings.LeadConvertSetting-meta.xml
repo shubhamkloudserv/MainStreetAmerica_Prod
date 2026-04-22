@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LeadConvertSettings xmlns="http://soap.sforce.com/2006/04/metadata">
+    <allowOwnerChange>true</allowOwnerChange>
+    <objectMapping>
+        <inputObject>Lead</inputObject>
+        <mappingFields>
+            <inputField>Donation_Type__c</inputField>
+            <outputField>Donation_Type__c</outputField>
+        </mappingFields>
+        <mappingFields>
+            <inputField>Donor_Type__c</inputField>
+            <outputField>Donor_Type__c</outputField>
+        </mappingFields>
+        <mappingFields>
+            <inputField>Funding_priorities__c</inputField>
+            <outputField>Funding_priorities__c</outputField>
+        </mappingFields>
+        <mappingFields>
+            <inputField>Stage__c</inputField>
+            <outputField>Prospects__c</outputField>
+        </mappingFields>
+        <outputObject>Account</outputObject>
+    </objectMapping>
+    <opportunityCreationOptions>VisibleOptional</opportunityCreationOptions>
+</LeadConvertSettings>

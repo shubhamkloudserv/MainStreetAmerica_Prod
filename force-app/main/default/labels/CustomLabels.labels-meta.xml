@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>membership_Activation_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Membership_Activation_URL</shortDescription>
+        <value>https://members.mainstreet.org/membership/activate?memberId=</value>
+    </labels>
+</CustomLabels>

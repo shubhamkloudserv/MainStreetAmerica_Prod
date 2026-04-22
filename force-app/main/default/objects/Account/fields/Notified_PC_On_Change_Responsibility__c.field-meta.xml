@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Notified_PC_On_Change_Responsibility__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Tracks notification status; used in communication workflows for payment and notification</description>
+    <label>Notified PC On Change Responsibility</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Account$BillingCity</field>
+    </columns>
+    <columns>
+        <field>Account$BillingStateCode</field>
+    </columns>
+    <columns>
+        <field>Account$Name</field>
+    </columns>
+    <columns>
+        <field>Account.Memberships__r$Name</field>
+    </columns>
+    <columns>
+        <field>Account.Memberships__r$TermStartDate__c</field>
+    </columns>
+    <columns>
+        <field>Account.Memberships__r$TermEndDate__c</field>
+    </columns>
+    <columns>
+        <field>Account.Memberships__r.Membership_Transactions__r$PaymentMethod__c</field>
+    </columns>
+    <columns>
+        <field>Account.Memberships__r$Membership_Type__c</field>
+    </columns>
+    <description>Accounts with Memberships paid by CP.</description>
+    <filter>
+        <criteriaItems>
+            <column>Account.Memberships__r$Membership_Type__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>General Member,Main Street America Community Member,Start-up Member</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Account.Memberships__r.Membership_Transactions__r$PaymentMethod__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Paid By CP</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Account$BillingStateCode</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>,AL,AK,AB,AR,AZ,BC,CA,CT,CO,DE,DC,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MN,MB,MA,MD,MS,MT,MO,MI,NL,NE,NV,NB,NH,NJ,NM,NY,NC,ND,NT,NS,NU,OR,OH,OK,ON,PA,PE,QC,RI,SC,SK,SD,TN,TX,UT,VA,VT,WA,WV,WI,WY,YT</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Account$Account_Id__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>CP-Paid Local Membership Report V-2.0</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Account_Membership_Transaction_and_Memberships__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>false</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Account$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

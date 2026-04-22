@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All_Program_Relationships</fullName>
+    <columns>NAME</columns>
+    <columns>Local_Program__c</columns>
+    <columns>Coordinating_Program__c</columns>
+    <columns>TermYear__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Program Relationships</label>
+</ListView>

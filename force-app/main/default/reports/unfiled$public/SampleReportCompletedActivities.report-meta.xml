@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <block>
+        <blockInfo>
+            <blockId>B0</blockId>
+            <joinTable>te</joinTable>
+        </blockInfo>
+        <columns>
+            <field>CONTACT</field>
+        </columns>
+        <columns>
+            <field>SUBJECT</field>
+        </columns>
+        <columns>
+            <field>DUE_DATE</field>
+        </columns>
+        <columns>
+            <field>PRIORITY</field>
+        </columns>
+        <columns>
+            <field>TASK</field>
+        </columns>
+        <columns>
+            <field>ACCOUNT</field>
+        </columns>
+        <format>Summary</format>
+        <name>Tasks and Events block 1</name>
+        <params>
+            <name>closed</name>
+            <value>open</value>
+        </params>
+        <params>
+            <name>type</name>
+            <value>t</value>
+        </params>
+        <params>
+            <name>co</name>
+            <value>1</value>
+        </params>
+        <reportType>Activity</reportType>
+        <scope>organization</scope>
+        <showGrandTotal>true</showGrandTotal>
+        <showSubTotals>true</showSubTotals>
+        <sortColumn>DUE_DATE</sortColumn>
+        <sortOrder>Asc</sortOrder>
+        <timeFrameFilter>
+            <dateColumn>DUE_DATE</dateColumn>
+            <interval>INTERVAL_CUSTOM</interval>
+        </timeFrameFilter>
+    </block>
+    <blockInfo>
+        <blockId xsi:nil="true"/>
+        <joinTable>te</joinTable>
+    </blockInfo>
+    <description>How many activities are my users completing?</description>
+    <format>MultiBlock</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>ASSIGNED</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>STATUS</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Sample Report: Completed Activities</name>
+    <reportType>Activity</reportType>
+    <showDetails>true</showDetails>
+</Report>

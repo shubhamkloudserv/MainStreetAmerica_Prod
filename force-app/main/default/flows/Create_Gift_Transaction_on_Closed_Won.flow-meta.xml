@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Check_For_Required_Data</name>
+        <label>Check For Required Data</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Has_Amount</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Awarded_Amount__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Gift_Transaction</targetReference>
+            </connector>
+            <label>Yes, Has Amount</label>
+        </rules>
+    </decisions>
+    <environments>Default</environments>
+    <formulas>
+        <name>Anonymous_Display_Value</name>
+        <dataType>String</dataType>
+        <expression>IF(
+   {!$Record.Anonymous__c} = TRUE,
+   &quot;True&quot;,
+   &quot;False&quot;
+)</expression>
+    </formulas>
+    <formulas>
+        <name>Formula_GiftType</name>
+        <dataType>String</dataType>
+        <expression>IF(
+    ISBLANK({!$Record.AccountId}),
+    NULL,
+    IF(
+        {!$Record.Account.IsPersonAccount},
+        &quot;Individual&quot;,
+        &quot;Organizational&quot;
+    )
+)</expression>
+    </formulas>
+    <formulas>
+        <name>Gift_Transaction_Name</name>
+        <dataType>String</dataType>
+        <expression>{!$Record.Name} 
+&amp; &quot; - $&quot; &amp; 
+TEXT(FLOOR({!$Record.Awarded_Amount__c})) &amp; &quot;.&quot; &amp; 
+RIGHT(&quot;00&quot; &amp; TEXT(ROUND(MOD({!$Record.Awarded_Amount__c},1)*100,0)),2)
+&amp; &quot; - &quot; &amp; 
+TEXT(YEAR({!$Record.CloseDate})) &amp; &quot;/&quot; &amp; 
+LPAD(TEXT(MONTH({!$Record.CloseDate})), 2, &quot;0&quot;) &amp; &quot;/&quot; &amp; 
+LPAD(TEXT(DAY({!$Record.CloseDate})), 2, &quot;0&quot;)</expression>
+    </formulas>
+    <interviewLabel>Create Gift Transaction on Closed Won {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Create Gift Transaction on Closed Won Opportunity</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Create_Gift_Transaction</name>
+        <label>Create Gift Transaction</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Anonymous_Donation__c</field>
+            <value>
+                <elementReference>Anonymous_Display_Value</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>$Record.Description</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>DonorId</field>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>GiftType</field>
+            <value>
+                <elementReference>Formula_GiftType</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>Gift_Transaction_Name</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Opportunity__c</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OriginalAmount</field>
+            <value>
+                <elementReference>$Record.Awarded_Amount__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>PaymentMethod</field>
+            <value>
+                <elementReference>$Record.Payment_Method__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Paid</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>TransactionDate</field>
+            <value>
+                <elementReference>$Record.CloseDate</elementReference>
+            </value>
+        </inputAssignments>
+        <object>GiftTransaction</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_For_Required_Data</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Closed Won</stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
