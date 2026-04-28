@@ -17,8 +17,10 @@ trigger InvoicePDFTrigger on Invoice__c (after insert,after update) {
         }
         
         if (!paidInvoiceIds.isEmpty()) {
+            Set<Id> paidInvoiceIdSet = new Set<Id>(paidInvoiceIds);
             // Call the future method to handle the complex processing asynchronously
-            MembershipInvoiceProcess.generateAndSendInvoice(paidInvoiceIds);
+            //MembershipInvoiceProcess.generateAndSendInvoice(paidInvoiceIds); // comment by shubham for testing-15Apr2026
+            MembershipInvoiceProcess_1.processInvoicesAsync(paidInvoiceIdSet);
         }
     }
 }
