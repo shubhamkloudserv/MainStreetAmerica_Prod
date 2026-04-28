@@ -32,7 +32,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aOUAS</stringValue>
+                <stringValue>00Xdp000000GzQvEAK</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -102,7 +102,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aOUAS</stringValue>
+                <stringValue>00Xdp000000GzQvEAK</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -148,7 +148,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Copy_2_of_Send_Membership_Expiration_Notice</targetReference>
+            <targetReference>Copy_1_of_Check_Bounced_email</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
@@ -162,9 +162,53 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Membership_Expiration_Notice</targetReference>
+                <targetReference>Check_Bounced_email</targetReference>
             </connector>
             <label>Is Person Account</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Bounced_email</name>
+        <label>Check Bounced email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Related_Accounts.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Membership_Expiration_Notice</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_1_of_Check_Bounced_email</name>
+        <label>Check Bounced email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Related_Accounts.Primary_Contact__r.EmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_2_of_Send_Membership_Expiration_Notice</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
         </rules>
     </decisions>
     <environments>Default</environments>

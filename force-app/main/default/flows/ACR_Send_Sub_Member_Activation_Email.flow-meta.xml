@@ -85,7 +85,7 @@
         <inputParameters>
             <name>relatedRecordId</name>
             <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
                 <stringValue></stringValue>
             </value>
         </inputParameters>
@@ -118,9 +118,31 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Membership_Activation_Email</targetReference>
+                <targetReference>Check_Bounced_Email</targetReference>
             </connector>
             <label>Active Membership</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Bounced_Email</name>
+        <label>Check  Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Contact_Details.IsEmailBounced</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Membership_Activation_Email</targetReference>
+            </connector>
+            <label>Not bounced Email</label>
         </rules>
     </decisions>
     <decisions>
@@ -149,7 +171,7 @@
     <formulas>
         <name>activationLink</name>
         <dataType>String</dataType>
-        <expression>&quot;https://members.mainstreet.org/membership/activate?memberId=&quot; &amp; {!Encrypt_Contact_Id.encryptedContactId}</expression>
+        <expression>&quot;https://members.msa.preview.rygn.io/membership/activate?memberId=&quot; &amp; {!Encrypt_Contact_Id.encryptedContactId}</expression>
     </formulas>
     <interviewLabel>ACR - Send Sub Member Activation Email {!$Flow.CurrentDateTime}</interviewLabel>
     <label>ACR - Send Sub Member Activation Email</label>
@@ -232,14 +254,14 @@
             <field>Roles</field>
             <operator>EqualTo</operator>
             <value>
-                <stringValue>Sub Member</stringValue>
+                <stringValue>Sub-Member</stringValue>
             </value>
         </filters>
         <filters>
             <field>Roles</field>
             <operator>EqualTo</operator>
             <value>
-                <stringValue>Sub-Member</stringValue>
+                <stringValue>Primary Contact</stringValue>
             </value>
         </filters>
         <object>AccountContactRelation</object>
@@ -253,7 +275,7 @@
         <text>&lt;table class=&quot;ql-table-blob&quot; style=&quot;margin: 0 auto; width: 100%; max-width: 600px; background-color: #ffffff; font-size: 14px; color: #333333; border-spacing: 0; border-radius: 8px; overflow: hidden;&quot; width=&quot;100%&quot;&gt;
 	&lt;tbody&gt;
 		&lt;tr&gt;
-			&lt;td style=&quot;padding: 20px; background-color: #ffffff; text-align: center;&quot;&gt;&lt;a href=&quot;https://www.mainstreet.org/&quot;&gt;&lt;img alt=&quot;Main Street America Logo&quot; src=&quot;https://nationalmainstreetcenter2.my.salesforce.com/servlet/servlet.ImageServer?id=015aJ00000EU9H7&amp;oid=00Dfm000000BWKj&amp;lastMod=1770631915000&quot; style=&quot;max-width: 200px; border: 0;&quot; width=&quot;200&quot;/&gt;&lt;/a&gt;&lt;/td&gt;
+			&lt;td style=&quot;padding: 20px; background-color: #ffffff; text-align: center;&quot;&gt;&lt;a href=&quot;https://www.mainstreet.org/&quot;&gt;&lt;img alt=&quot;Main Street America Logo&quot; src=&quot;https://cdn.mainstreet.org/logos/msa-logo.png&quot; style=&quot;max-width: 200px; border: 0;&quot; width=&quot;200&quot;/&gt;&lt;/a&gt;&lt;/td&gt;
 		&lt;/tr&gt;
 		&lt;tr&gt;
 			&lt;td class=&quot;content&quot; style=&quot;padding: 30px 40px; text-align: left;&quot;&gt;
@@ -261,6 +283,39 @@
 			&lt;p style=&quot;line-height: 1.6; margin: 0 0 20px 0;&quot;&gt;Hi {!Get_Contact_Details.FirstName},&lt;/p&gt;
 
 			&lt;p&gt;You’ve been added as an organizational contact for {!Get_Account_and_Membership_Details.Name}. This means you have full access to MSA member benefits! We’re excited to bring you valuable resources, learning experiences, and networking opportunities that make your job easier and maximize your impact in your community.&amp;nbsp;&lt;/p&gt;
+
+			&lt;p&gt;&lt;strong&gt;What&apos;s next? &amp;nbsp;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;First, finish setting up your &lt;a href=&quot;{!activationLink}&quot;&gt;Member Hub&lt;/a&gt; account. From there, you can...  &amp;nbsp;&lt;/p&gt;
+			&lt;ul&gt;&lt;li&gt;Participate in discussion forums with your peers. &lt;/li&gt;&lt;li&gt;Visit the &lt;a href=&quot;https://mainstreet.org/resources/knowledge-hub&quot;&gt;Knowledge Hub&lt;/a&gt;, our comprehensive digital library containing a broad range of resources, including our signature Main Street Approach handbooks.&lt;/li&gt;&lt;li&gt;Take your skills to the next level at the &lt;a href=&quot;https://mainstreet.org/resources/main-street-america-academy&quot;&gt;Main Street America Academy&lt;/a&gt;.&lt;/li&gt;&lt;/ul&gt;
+
+&lt;p&gt;Keep an eye out for Main Street Weekly, our members-only newsletter featuring our latest stories and how-to articles, events and opportunities, and important announcements. &lt;/p&gt;
+			Questions? Don&apos;t hesitate to &lt;a href=&quot;https://mainstreet.org/about/contact-us&quot;&gt;contact us&lt;/a&gt;.&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td class=&quot;footer&quot; style=&quot;background-color: #333333; color: #bbbbbb; padding: 20px 40px; text-align: center; font-size: 12px;&quot;&gt;
+			&lt;p style=&quot;line-height: 1.6; margin: 0 0 10px 0;&quot;&gt;Main Street America&lt;br&gt;
+			53 W. Jackson Blvd., Suite 350, Chicago, IL 60604&lt;/p&gt;
+
+			&lt;p style=&quot;line-height: 1.6; margin: 0;&quot;&gt;&lt;a href=&quot;https://members.msa.preview.rygn.io/my-account/settings&quot; style=&quot;color: #ffffff; text-decoration: underline;&quot;&gt;Update Subscription Preferences&lt;/a&gt; | &lt;a href=&quot;https://mainstreet.org/about/contact-us&quot; style=&quot;color: #ffffff; text-decoration: underline;&quot;&gt;Contact Us&lt;/a&gt;&lt;/p&gt;
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>primaryContactEmailBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>&lt;table class=&quot;ql-table-blob&quot; style=&quot;margin: 0 auto; width: 100%; max-width: 600px; background-color: #ffffff; font-size: 14px; color: #333333; border-spacing: 0; border-radius: 8px; overflow: hidden;&quot; width=&quot;100%&quot;&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td style=&quot;padding: 20px; background-color: #ffffff; text-align: center;&quot;&gt;&lt;a href=&quot;https://www.mainstreet.org/&quot;&gt;&lt;img alt=&quot;Main Street America Logo&quot; src=&quot;https://cdn.mainstreet.org/logos/msa-logo.png&quot; style=&quot;max-width: 200px; border: 0;&quot; width=&quot;200&quot;/&gt;&lt;/a&gt;&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td class=&quot;content&quot; style=&quot;padding: 30px 40px; text-align: left;&quot;&gt;
+
+			&lt;p style=&quot;line-height: 1.6; margin: 0 0 20px 0;&quot;&gt;Hi {!b6f7a3dd-b747-4c48-9c6e-4a20a6265612.FirstName},&lt;/p&gt;
+
+			&lt;p&gt;You’ve been added as a Primary Contact for {!285a3fa7-9971-4370-bde6-6c9ef09416f5.Name}. This means you have full access to MSA member benefits! We’re excited to bring you valuable resources, learning experiences, and networking opportunities that make your job easier and maximize your impact in your community.&amp;nbsp;&lt;/p&gt;
 
 			&lt;p&gt;&lt;strong&gt;What&apos;s next? &amp;nbsp;&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;First, finish setting up your &lt;a href=&quot;{!activationLink}&quot;&gt;Member Hub&lt;/a&gt; account. From there, you can...  &amp;nbsp;&lt;/p&gt;

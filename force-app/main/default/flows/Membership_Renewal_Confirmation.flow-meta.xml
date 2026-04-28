@@ -2,7 +2,7 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
         <name>Copy_1_of_Send_Renewal_Confirmation_Email</name>
-        <label>Copy 1 of Send Renewal Confirmation Email</label>
+        <label>Send Renewal Confirmation Email</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -35,7 +35,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aSUAS</stringValue>
+                <stringValue>00Xdp000000F2RJEA0</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -96,7 +96,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aSUAS</stringValue>
+                <stringValue>00Xdp000000F2RJEA0</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -124,6 +124,31 @@
     </actionCalls>
     <apiVersion>65.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Copy_1_of_Check_Prior_value_of_the_membership_is_queued</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Order.Account.PersonContact.EmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_1_of_Send_Renewal_Confirmation_Email</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
     <decisions>
         <name>Check_Enrollment_Type</name>
         <label>Check Enrollment Type</label>
@@ -180,6 +205,31 @@
                 <targetReference>Related_Account_Found</targetReference>
             </connector>
             <label>Yes Queued</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_1_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Check_Prior_value_of_the_membership_is_queued</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Order.Account.Primary_Contact__r.EmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Renewal_Confirmation_Email</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
         </rules>
     </decisions>
     <decisions>
@@ -297,7 +347,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Send_Renewal_Confirmation_Email</targetReference>
+            <targetReference>Copy_1_of_Check_Bounced_Email</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>No, Org Account</defaultConnectorLabel>
         <rules>
@@ -311,7 +361,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Copy_1_of_Send_Renewal_Confirmation_Email</targetReference>
+                <targetReference>Check_Bounced_Email</targetReference>
             </connector>
             <label>Yes, Person Account</label>
         </rules>

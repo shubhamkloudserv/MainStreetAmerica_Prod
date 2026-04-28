@@ -32,7 +32,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aVUAS</stringValue>
+                <stringValue>00Xdp000000H2OnEAK</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -83,7 +83,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aVUAS</stringValue>
+                <stringValue>00Xdp000000H2OnEAK</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -104,6 +104,28 @@
     </actionCalls>
     <apiVersion>65.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Local_Program__r.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Membership_Payment_Responsibility_Notice</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
     <decisions>
         <name>Check_RENEW_Order</name>
         <label>Check RENEW Order</label>
@@ -127,12 +149,34 @@
         </rules>
     </decisions>
     <decisions>
+        <name>Copy_1_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Local_Program__r.Primary_Contact__r.EmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Org_Send_Membership_Payment_Responsibility_Notice</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>Is_Person_Account</name>
         <label>Is Person Account</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Org_Send_Membership_Payment_Responsibility_Notice</targetReference>
+            <targetReference>Copy_1_of_Check_Bounced_Email</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
@@ -146,7 +190,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Membership_Payment_Responsibility_Notice</targetReference>
+                <targetReference>Check_Bounced_Email</targetReference>
             </connector>
             <label>Yes</label>
         </rules>

@@ -100,9 +100,24 @@
                 <leftValueReference>$Record__Prior.Roles</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
-                    <stringValue>Sub Member</stringValue>
+                    <stringValue>Sub-Member</stringValue>
                 </rightValue>
             </conditions>
+            <connector>
+                <targetReference>Get_Account_and_Membership_Details</targetReference>
+            </connector>
+            <label>Yes, Admin or Member or PC</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Roles</name>
+        <label>Check Roles</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Sub_Member_or_Admin</name>
+            <conditionLogic>or</conditionLogic>
             <conditions>
                 <leftValueReference>$Record__Prior.Roles</leftValueReference>
                 <operator>EqualTo</operator>
@@ -110,10 +125,39 @@
                     <stringValue>Sub-Member</stringValue>
                 </rightValue>
             </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Roles</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admin</stringValue>
+                </rightValue>
+            </conditions>
             <connector>
-                <targetReference>Get_Account_and_Membership_Details</targetReference>
+                <targetReference>Copy_1_of_Check_Bounced_Email</targetReference>
             </connector>
-            <label>Yes, Admin or Member</label>
+            <label>Sub-Member or Admin</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_1_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_Not_bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record__Prior.Contact.EmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Membership_Activation_Email</targetReference>
+            </connector>
+            <label>Not bounced Email</label>
         </rules>
     </decisions>
     <environments>Default</environments>
@@ -166,7 +210,7 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Send_Membership_Activation_Email</targetReference>
+            <targetReference>Check_Roles</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -205,7 +249,7 @@
         <text>&lt;table class=&quot;ql-table-blob&quot; style=&quot;margin: 0 auto; width: 100%; max-width: 600px; background-color: #ffffff; font-size: 14px; color: #333333; border-spacing: 0; border-radius: 8px; overflow: hidden;&quot; width=&quot;100%&quot;&gt;
 	&lt;tbody&gt;
 		&lt;tr&gt;
-			&lt;td style=&quot;padding: 20px; background-color: #ffffff; text-align: center;&quot;&gt;&lt;a href=&quot;https://www.mainstreet.org/&quot;&gt;&lt;img alt=&quot;Main Street America Logo&quot; src=&quot;https://nationalmainstreetcenter2.my.salesforce.com/servlet/servlet.ImageServer?id=015aJ00000EU9H7&amp;oid=00Dfm000000BWKj&amp;lastMod=1770631915000&quot; style=&quot;max-width: 200px; border: 0;&quot; width=&quot;200&quot;/&gt;&lt;/a&gt;&lt;/td&gt;
+			&lt;td style=&quot;padding: 20px; background-color: #ffffff; text-align: center;&quot;&gt;&lt;a href=&quot;https://www.mainstreet.org/&quot;&gt;&lt;img alt=&quot;Main Street America Logo&quot; src=&quot;https://cdn.mainstreet.org/logos/msa-logo.png&quot; style=&quot;max-width: 200px; border: 0;&quot; width=&quot;200&quot;/&gt;&lt;/a&gt;&lt;/td&gt;
 		&lt;/tr&gt;
 		&lt;tr&gt;
 			&lt;td class=&quot;content&quot; style=&quot;padding: 30px 40px; text-align: left;&quot;&gt;
@@ -213,6 +257,37 @@
 			&lt;p style=&quot;line-height: 1.6; margin: 0 0 20px 0;&quot;&gt;Hi {!Get_Contact_Details.FirstName},&lt;/p&gt;
 
 			&lt;p&gt;We wanted to let you know {!Get_Account_and_Membership_Details.Name} has removed you as an organizational contact, and you will no longer have access to their MSA member benefits. Don’t worry, we’ll keep your account so you can access your records, start a new membership, or transfer to a new organization if needed.&amp;nbsp;&lt;/p&gt;
+
+			&lt;p&gt;&lt;strong&gt;Please note: you can still use this account to access Main Street Academy courses! Make sure to update your email address with us to maintain access and continue your learning journey progress. &amp;nbsp;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;If you need help updating your account, just let us know. We’re here to help! &amp;nbsp;&lt;/p&gt;
+			
+			Questions? Don&apos;t hesitate to &lt;a href=&quot;https://mainstreet.org/about/contact-us&quot;&gt;contact us&lt;/a&gt;.&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td class=&quot;footer&quot; style=&quot;background-color: #333333; color: #bbbbbb; padding: 20px 40px; text-align: center; font-size: 12px;&quot;&gt;
+			&lt;p style=&quot;line-height: 1.6; margin: 0 0 10px 0;&quot;&gt;Main Street America&lt;br&gt;
+			53 W. Jackson Blvd., Suite 350, Chicago, IL 60604&lt;/p&gt;
+
+			&lt;p style=&quot;line-height: 1.6; margin: 0;&quot;&gt;&lt;a href=&quot;https://members.msa.preview.rygn.io/my-account/settings&quot; style=&quot;color: #ffffff; text-decoration: underline;&quot;&gt;Update Subscription Preferences&lt;/a&gt; | &lt;a href=&quot;https://mainstreet.org/about/contact-us&quot; style=&quot;color: #ffffff; text-decoration: underline;&quot;&gt;Contact Us&lt;/a&gt;&lt;/p&gt;
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>primaryContactEmailBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>&lt;table class=&quot;ql-table-blob&quot; style=&quot;margin: 0 auto; width: 100%; max-width: 600px; background-color: #ffffff; font-size: 14px; color: #333333; border-spacing: 0; border-radius: 8px; overflow: hidden;&quot; width=&quot;100%&quot;&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td style=&quot;padding: 20px; background-color: #ffffff; text-align: center;&quot;&gt;&lt;a href=&quot;https://www.mainstreet.org/&quot;&gt;&lt;img alt=&quot;Main Street America Logo&quot; src=&quot;https://cdn.mainstreet.org/logos/msa-logo.png&quot; style=&quot;max-width: 200px; border: 0;&quot; width=&quot;200&quot;/&gt;&lt;/a&gt;&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td class=&quot;content&quot; style=&quot;padding: 30px 40px; text-align: left;&quot;&gt;
+
+			&lt;p style=&quot;line-height: 1.6; margin: 0 0 20px 0;&quot;&gt;Hi {!Get_Contact_Details.FirstName},&lt;/p&gt;
+
+			&lt;p&gt;We wanted to let you know {!Get_Account_and_Membership_Details.Name} has removed you as a primary contact, and you will no longer have access to their MSA member benefits. Don’t worry, we’ll keep your account so you can access your records, start a new membership, or transfer to a new organization if needed.&amp;nbsp;&lt;/p&gt;
 
 			&lt;p&gt;&lt;strong&gt;Please note: you can still use this account to access Main Street Academy courses! Make sure to update your email address with us to maintain access and continue your learning journey progress. &amp;nbsp;&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;If you need help updating your account, just let us know. We’re here to help! &amp;nbsp;&lt;/p&gt;

@@ -32,7 +32,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aRUAS</stringValue>
+                <stringValue>00Xdp000000GzPJEA0</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -102,7 +102,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aRUAS</stringValue>
+                <stringValue>00Xdp000000GzPJEA0</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -171,8 +171,7 @@
         <inputParameters>
             <name>emailTemplateId</name>
             <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aQUAS</stringValue>
+                <stringValue>00Xdp000000DKTxEAO</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -241,8 +240,7 @@
         <inputParameters>
             <name>emailTemplateId</name>
             <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aQUAS</stringValue>
+                <stringValue>00Xdp000000DKTxEAO</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -298,10 +296,36 @@
                     <booleanValue>false</booleanValue>
                 </rightValue>
             </conditions>
+            <conditions>
+                <leftValueReference>Find_Parent_Account.PersonEmailBouncedDate</leftValueReference>
+                <operator>EqualTo</operator>
+            </conditions>
             <connector>
                 <targetReference>Is_Person_Account</targetReference>
             </connector>
             <label>Yes, Account Found</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Find_Parent_Account.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Person_Send_Refund_Confirmation_Email</targetReference>
+            </connector>
+            <label>Not bounced Email</label>
         </rules>
     </decisions>
     <decisions>
@@ -310,7 +334,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Send_Refund_Confirmation_Email</targetReference>
+            <targetReference>Copy_1_of_Check_Bounced_Email</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
@@ -324,9 +348,31 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Person_Send_Refund_Confirmation_Email</targetReference>
+                <targetReference>Check_Bounced_Email</targetReference>
             </connector>
             <label>Cheque</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_1_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Find_Parent_Account.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Refund_Confirmation_Email</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
         </rules>
     </decisions>
     <decisions>
@@ -335,7 +381,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Send_Refund_Confirmation_Email_Org</targetReference>
+            <targetReference>Copy_3_of_Check_Bounced_Email</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
@@ -349,9 +395,53 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Org_Send_Refund_Confirmation_Email_Org</targetReference>
+                <targetReference>Copy_2_of_Check_Bounced_Email</targetReference>
             </connector>
             <label>Copy 1 of Cheque</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_2_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_2_of_Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Find_Parent_Account.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Org_Send_Refund_Confirmation_Email_Org</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_3_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_3_of_Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Find_Parent_Account.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Refund_Confirmation_Email_Org</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
         </rules>
     </decisions>
     <decisions>

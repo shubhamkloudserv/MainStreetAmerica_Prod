@@ -32,7 +32,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aNUAS</stringValue>
+                <stringValue>00Xdp000000D0bhEAC</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -54,6 +54,28 @@
     </actionCalls>
     <apiVersion>65.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Local_Program__r.Primary_Contact__r.EmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Change_in_responsibility_notification</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
     <environments>Default</environments>
     <interviewLabel>Change in Payment Responsibility Notification - Program Relationship {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Change in Payment Responsibility Notification - Program Relationship</label>
@@ -80,7 +102,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Send_Change_in_responsibility_notification</targetReference>
+            <targetReference>Check_Bounced_Email</targetReference>
         </connector>
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterLogic>and</filterLogic>

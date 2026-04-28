@@ -2,7 +2,7 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
         <name>Copy_1_of_Send_Activation_Email</name>
-        <label>Copy 1 of Send Activation Email</label>
+        <label>Send Activation Email</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <actionName>emailSimple</actionName>
@@ -32,7 +32,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aXUAS</stringValue>
+                <stringValue>00Xdp000000DBvJEAW</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -102,7 +102,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004W7aXUAS</stringValue>
+                <stringValue>00Xdp000000DBvJEAW</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -149,6 +149,28 @@
         </value>
     </customProperties>
     <decisions>
+        <name>Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Account_Record.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Manual_Activation_Email</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>Check_Is_Person_Account</name>
         <label>Check Is Person Account</label>
         <locationX>0</locationX>
@@ -174,8 +196,30 @@
         </rules>
     </decisions>
     <decisions>
+        <name>Copy_1_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_Not_Bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Accout_Record_With_Primary_Contact.Primary_Contact__r.EmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_1_of_Send_Activation_Email</targetReference>
+            </connector>
+            <label>Not Bounced Email</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>Copy_1_of_Has_Membership</name>
-        <label>Copy 1 of Has Membership?</label>
+        <label>Has Membership?</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
@@ -193,9 +237,9 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Copy_1_of_Send_Activation_Email</targetReference>
+                <targetReference>Copy_1_of_Check_Bounced_Email</targetReference>
             </connector>
-            <label>Copy 1 of Yes</label>
+            <label>Yes</label>
         </rules>
     </decisions>
     <decisions>
@@ -218,7 +262,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Manual_Activation_Email</targetReference>
+                <targetReference>Check_Bounced_Email</targetReference>
             </connector>
             <label>Yes</label>
         </rules>

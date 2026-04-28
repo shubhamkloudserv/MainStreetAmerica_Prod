@@ -40,7 +40,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004hhtpUAA</stringValue>
+                <stringValue>00Xdp000000IyaPEAS</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -106,7 +106,7 @@
             <name>emailTemplateId</name>
             <value>
                 <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XaJ000004hhtpUAA</stringValue>
+                <stringValue>00Xdp000000IyaPEAS</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -147,7 +147,7 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Copy_1_of_Send_Donation_Confirmation_Email</targetReference>
+            <targetReference>Copy_1_of_Check_Bounced_Email</targetReference>
         </defaultConnector>
         <defaultConnectorLabel>Org Account or Default Outcome</defaultConnectorLabel>
         <rules>
@@ -161,9 +161,53 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Send_Donation_Confirmation_Email</targetReference>
+                <targetReference>Check_Bounced_Email</targetReference>
             </connector>
             <label>Person Account</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Not_bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Donor.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Send_Donation_Confirmation_Email</targetReference>
+            </connector>
+            <label>Not bounced Email</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Copy_1_of_Check_Bounced_Email</name>
+        <label>Check Bounced Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Copy_1_of_Not_bounced_Email</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Donor.PersonEmailBouncedDate</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_1_of_Send_Donation_Confirmation_Email</targetReference>
+            </connector>
+            <label>Not bounced Email</label>
         </rules>
     </decisions>
     <environments>Default</environments>
