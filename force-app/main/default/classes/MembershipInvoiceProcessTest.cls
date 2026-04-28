@@ -20,16 +20,10 @@ private class MembershipInvoiceProcessTest {
         }
         
         // --- 2. Create Contacts ---
-        Contact cpContact = new Contact(
-            FirstName = 'Chris', 
-            LastName = 'Program', 
-            Email = 'cp_contact@test.com'
-        );
-        Contact businessContact = new Contact(
-            FirstName = 'Betty', 
-            LastName = 'Business', 
-            Email = 'business_contact@test.com'
-        );
+        Contact cpContact = new Contact(FirstName = 'Chris', LastName = 'Program', Email = 'cp_contact@test.com');
+        
+        Contact businessContact = new Contact(FirstName = 'Betty', LastName = 'Business', Email = 'business_contact@test.com');
+        
         insert new List<Contact>{ cpContact, businessContact };
 
         // --- 3. Create Accounts ---
@@ -74,63 +68,34 @@ private class MembershipInvoiceProcessTest {
 
         // --- 5. Create Orders ---
         Date orderEndDate = Date.newInstance(Date.today().year(), 12, 31);
-        Order orderForLP = new Order(
-            AccountId = lpAccount.Id, 
-            EffectiveDate = Date.today(), 
-            EndDate = orderEndDate, 
-            Status = 'Draft', 
-            Billing_Type__c = 'Paid by Coordinating Program'
-        );
-        Order orderForBusiness = new Order(
-            AccountId = businessAccount.Id, 
-            EffectiveDate = Date.today(), 
-            EndDate = orderEndDate, 
-            Status = 'Draft', 
-            Billing_Type__c = 'Self-Pay'
-        );
-        Order orderForPerson = new Order(
-            AccountId = personAccount.Id, 
-            EffectiveDate = Date.today(), 
-            EndDate = orderEndDate, 
-            Status = 'Draft', 
-            Billing_Type__c = 'Self-Pay'
-        );
+        Order orderForLP = new Order(AccountId = lpAccount.Id, EffectiveDate = Date.today(), EndDate = orderEndDate, 
+            							Status = 'Draft', Billing_Type__c = 'Paid by Coordinating Program');
+        
+        Order orderForBusiness = new Order(AccountId = businessAccount.Id, EffectiveDate = Date.today(), 
+            								EndDate = orderEndDate, Status = 'Draft', Billing_Type__c = 'Self-Pay');
+        
+        Order orderForPerson = new Order(AccountId = personAccount.Id, EffectiveDate = Date.today(), EndDate = orderEndDate, 
+            								Status = 'Draft', Billing_Type__c = 'Self-Pay');
+        
         insert new List<Order>{ orderForLP, orderForBusiness, orderForPerson };
 
         // --- 6. Create Invoices ---
-        Invoice__c invForCP = new Invoice__c(
-            Bill_To_Account__c = lpAccount.Id, 
-            Related_Order__c = orderForLP.Id, 
-            Status__c = 'Draft'
-        );
-        Invoice__c invForBusiness = new Invoice__c(
-            Bill_To_Account__c = businessAccount.Id, 
-            Bill_To_Contact__c = businessContact.Id, 
-            Related_Order__c = orderForBusiness.Id,
-            Status__c = 'Draft'
-        );
-        Invoice__c invForPerson = new Invoice__c(
-            Bill_To_Account__c = personAccount.Id, 
-            Related_Order__c = orderForPerson.Id,
-            Status__c = 'Draft'
-        );
-        Invoice__c invNoTransaction = new Invoice__c(
-            Bill_To_Account__c = personAccount.Id, 
-            Related_Order__c = orderForPerson.Id,
-            Status__c = 'Draft'
-        );
-        Invoice__c invNoRecipient = new Invoice__c(
-            Bill_To_Account__c = businessAccount.Id, 
-            Related_Order__c = orderForBusiness.Id,
-            Status__c = 'Draft'
-        );
-        insert new List<Invoice__c>{ 
-            invForCP, 
-            invForBusiness, 
-            invForPerson, 
-            invNoTransaction, 
-            invNoRecipient 
-        };
+        Invoice__c invForCP = new Invoice__c(Bill_To_Account__c = lpAccount.Id, Related_Order__c = orderForLP.Id, 
+            									Status__c = 'Draft');
+        
+        Invoice__c invForBusiness = new Invoice__c(Bill_To_Account__c = businessAccount.Id, Bill_To_Contact__c = businessContact.Id, 
+            										Related_Order__c = orderForBusiness.Id, Status__c = 'Draft');
+        
+        Invoice__c invForPerson = new Invoice__c(Bill_To_Account__c = personAccount.Id, Related_Order__c = orderForPerson.Id, 
+                                                 Status__c = 'Draft');
+        
+        Invoice__c invNoTransaction = new Invoice__c(Bill_To_Account__c = personAccount.Id, Related_Order__c = orderForPerson.Id,
+            										Status__c = 'Draft');
+        
+        Invoice__c invNoRecipient = new Invoice__c(Bill_To_Account__c = businessAccount.Id, Related_Order__c = orderForBusiness.Id,
+            										Status__c = 'Draft');
+        
+        insert new List<Invoice__c>{ invForCP, invForBusiness, invForPerson, invNoTransaction, invNoRecipient };
         
         // --- 7. Create Transactions (for all except the "no transaction" test case) ---
         insert new List<Membership_Transaction__c>{
@@ -145,106 +110,77 @@ private class MembershipInvoiceProcessTest {
     @isTest
     static void testPaidByCoordinatingProgramSuccess() {
         // Query the Invoice created in @testSetup
-        Invoice__c invForCP = [
-            SELECT Id 
-            FROM Invoice__c 
-            WHERE Bill_To_Account__r.Name = 'Local Program (Paid by CP)' 
-            AND Related_Order__r.Billing_Type__c = 'Paid by Coordinating Program'
-            LIMIT 1
-        ];
+        Invoice__c invForCP = [SELECT Id FROM Invoice__c 
+            					WHERE Bill_To_Account__r.Name = 'Local Program (Paid by CP)' 
+            					AND Related_Order__r.Billing_Type__c = 'Paid by Coordinating Program'
+            					LIMIT 1];
        
         Test.startTest();
-        MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invForCP.Id });
+        //MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invForCP.Id });
+        MembershipInvoiceProcess_1.processInvoicesAsync(new Set<Id>{ invForCP.Id });
         Test.stopTest();
-
-        
     }
 
     @isTest
     static void testSelfPayBusinessAccountSuccess() {
         // Query the Invoice created in @testSetup
-        Invoice__c invForBusiness = [
-            SELECT Id 
-            FROM Invoice__c 
-            WHERE Bill_To_Account__r.Name = 'Self-Pay Business LLC'
-            AND Bill_To_Contact__c != null
-            LIMIT 1
-        ];
-        
+        Invoice__c invForBusiness = [SELECT Id FROM Invoice__c 
+            							WHERE Bill_To_Account__r.Name = 'Self-Pay Business LLC'
+            							AND Bill_To_Contact__c != null
+            							LIMIT 1];
         Test.startTest();
-        MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invForBusiness.Id });
+        //MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invForBusiness.Id });
+        MembershipInvoiceProcess_1.processInvoicesAsync(new Set<Id>{ invForBusiness.Id });
         Test.stopTest();
-        
-       
     }
 
     @isTest
     static void testSelfPayPersonAccountSuccess() {
         // Query the Invoice created in @testSetup
-        Invoice__c invForPerson = [
-            SELECT Id 
-            FROM Invoice__c 
-            WHERE Bill_To_Account__r.FirstName = 'Pat'
-            AND Bill_To_Account__r.IsPersonAccount = true
-            LIMIT 1
-        ];
+        Invoice__c invForPerson = [SELECT Id FROM Invoice__c 
+            						WHERE Bill_To_Account__r.FirstName = 'Pat'
+            						AND Bill_To_Account__r.IsPersonAccount = true
+            						LIMIT 1];
         
         Test.startTest();
-        MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invForPerson.Id });
+        //MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invForPerson.Id });
+        MembershipInvoiceProcess_1.processInvoicesAsync(new Set<Id>{ invForPerson.Id });
         Test.stopTest();
-
-        
     }
 
     @isTest
     static void testInvoiceSkipped_NoTransaction() {
         // Query the Invoice WITHOUT a transaction
-        Invoice__c invNoTransaction = [
-            SELECT Id 
-            FROM Invoice__c 
-            WHERE Id NOT IN (
-                SELECT Invoice__c 
-                FROM Membership_Transaction__c
-            )
-            AND Bill_To_Account__r.FirstName = 'Pat'
-            LIMIT 1
-        ];
+        Invoice__c invNoTransaction = [SELECT Id FROM Invoice__c 
+            							WHERE Id NOT IN (SELECT Invoice__c FROM Membership_Transaction__c)
+            							AND Bill_To_Account__r.FirstName = 'Pat'
+            							LIMIT 1];
         
         Test.startTest();
-        MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invNoTransaction.Id });
+        //MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invNoTransaction.Id });
+        MembershipInvoiceProcess_1.processInvoicesAsync(new Set<Id>{ invNoTransaction.Id });
         Test.stopTest();
-       
-        
     }
 
     @isTest
     static void testInvoiceSkipped_NoRecipient() {
         // Query the Invoice WITHOUT recipient contact/email
-        Invoice__c invNoRecipient = [
-            SELECT Id 
-            FROM Invoice__c 
-            WHERE Bill_To_Contact__c = null
-            AND Bill_To_Account__r.Name = 'Self-Pay Business LLC'
-            AND Id NOT IN (
-                SELECT Invoice__c 
-                FROM Membership_Transaction__c
-            )
-            LIMIT 1
-        ];
-        
+        Invoice__c invNoRecipient = [SELECT Id FROM Invoice__c 
+            							WHERE Bill_To_Contact__c = null
+            							AND Bill_To_Account__r.Name = 'Self-Pay Business LLC'
+            							AND Id NOT IN (SELECT Invoice__c FROM Membership_Transaction__c)
+            							LIMIT 1];
         Test.startTest();
-        MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invNoRecipient.Id });
+        //MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>{ invNoRecipient.Id });
+        MembershipInvoiceProcess_1.processInvoicesAsync(new Set<Id>{ invNoRecipient.Id });
         Test.stopTest();
- 
-        
     }
 
     @isTest
     static void testEmptyInputList() {
         Test.startTest();
-        MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>());
+        //MembershipInvoiceProcess.generateAndSendInvoice(new List<Id>());
+        MembershipInvoiceProcess_1.processInvoicesAsync(new Set<Id>());
         Test.stopTest();
-
-        
     }
 }
