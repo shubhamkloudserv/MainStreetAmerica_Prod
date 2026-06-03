@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Membership Level --></label>
+    <name>MembershipLevel__c</name>
+    <picklistValues>
+        <masterLabel>Allied Member</masterLabel>
+        <translation><!-- Allied Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Allied Staff Sub-member</masterLabel>
+        <translation><!-- Allied Staff Sub-member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Board Member</masterLabel>
+        <translation><!-- Board Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>CAMSA Member</masterLabel>
+        <translation><!-- CAMSA Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>CAMSA Staff Sub-member</masterLabel>
+        <translation><!-- CAMSA Staff Sub-member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Complimentary Membership</masterLabel>
+        <translation><!-- Complimentary Membership --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Coordinating Program Member</masterLabel>
+        <translation><!-- Coordinating Program Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Coordinating Staff Sub-member</masterLabel>
+        <translation><!-- Coordinating Staff Sub-member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Friend of Main Street</masterLabel>
+        <translation><!-- Friend of Main Street --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>General Member</masterLabel>
+        <translation><!-- General Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>General Staff Sub-member</masterLabel>
+        <translation><!-- General Staff Sub-member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ILMS Member</masterLabel>
+        <translation><!-- ILMS Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ILMS Staff Sub-member</masterLabel>
+        <translation><!-- ILMS Staff Sub-member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Main Street America Community Member</masterLabel>
+        <translation><!-- Main Street America Community Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>NMSC Staff Member</masterLabel>
+        <translation><!-- NMSC Staff Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Start-up Member</masterLabel>
+        <translation><!-- Start-up Member --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Start-up Sub-member</masterLabel>
+        <translation><!-- Start-up Sub-member --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

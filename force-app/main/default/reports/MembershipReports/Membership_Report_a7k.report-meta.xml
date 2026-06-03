@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Memberships__c$Name</field>
+    </columns>
+    <columns>
+        <field>Memberships__c$Enrollment_Id__c</field>
+    </columns>
+    <columns>
+        <field>Memberships__c$Membership_Status__c</field>
+    </columns>
+    <columns>
+        <field>Memberships__c$LastModifiedBy</field>
+    </columns>
+    <columns>
+        <field>Memberships__c.Membership_Transactions__r$Account_Id__c</field>
+    </columns>
+    <description>List of all Memberships created from Jan 1 to Mar 31 2026.</description>
+    <format>Tabular</format>
+    <name>Membership Report</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Membership_with_Accounts__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Memberships__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_CURRENT</interval>
+    </timeFrameFilter>
+</Report>

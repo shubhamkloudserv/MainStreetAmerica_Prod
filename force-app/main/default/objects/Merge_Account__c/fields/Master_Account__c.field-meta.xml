@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Master_Account__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Master Account</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Merge Accounts (Master)</relationshipLabel>
+    <relationshipName>Merge_Accounts_As_Master</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

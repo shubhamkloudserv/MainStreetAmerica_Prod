@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Billing_Type__c</fullName>
+    <description>Defines the billing type (e.g., self-pay, paid by CP) who pays for this transaction; used to drive billing logic and reporting.</description>
+    <inlineHelpText>To Modify the Billing Type, Please Navigate to and Update the Associated Order Record.</inlineHelpText>
+    <label>Billing Type</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Self-Pay</fullName>
+                <default>false</default>
+                <label>Self-Pay</label>
+            </value>
+            <value>
+                <fullName>Paid By Coordinating Program</fullName>
+                <default>false</default>
+                <label>Paid By Coordinating Program</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

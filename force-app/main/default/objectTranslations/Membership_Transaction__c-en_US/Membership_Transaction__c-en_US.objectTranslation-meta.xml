@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Membership Transaction</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Membership Transactions</value>
+    </caseValues>
+    <layouts>
+        <layout>Membership Transaction Layout</layout>
+        <sections>
+            <label><!-- Check Details --></label>
+            <section>Check Details</section>
+        </sections>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+        <sections>
+            <label><!-- Gateway Information --></label>
+            <section>Gateway Information</section>
+        </sections>
+        <sections>
+            <label><!-- Payment Information --></label>
+            <section>Payment Information</section>
+        </sections>
+    </layouts>
+    <quickActions>
+        <label><!-- Process Payment --></label>
+        <name>Process_Payment</name>
+    </quickActions>
+    <startsWith>Consonant</startsWith>
+    <validationRules>
+        <errorMessage><!-- Please fill this field! --></errorMessage>
+        <name>Fill_CP_Payment_Category</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- Please provide a payment method when the status is &apos;Paid&apos;. --></errorMessage>
+        <name>Payment_Method_Required_for_Paid_Status</name>
+    </validationRules>
+</CustomObjectTranslation>

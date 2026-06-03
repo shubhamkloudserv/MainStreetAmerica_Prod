@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Designation Type --></label>
+    <name>Designation_Type__c</name>
+    <picklistValues>
+        <masterLabel>Accredited</masterLabel>
+        <translation><!-- Accredited --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Affliated</masterLabel>
+        <translation><!-- Affliated --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

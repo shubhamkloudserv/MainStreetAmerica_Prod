@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help>
+        <!-- Financially Supported: The CP pays for the LP.
+Jurisdictional: The LP pays for itself. -->
+    </help>
+    <label><!-- Relationship Type --></label>
+    <name>Relationship_Type__c</name>
+    <picklistValues>
+        <masterLabel>Jurisdictional</masterLabel>
+        <translation><!-- Jurisdictional --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Pays LP Membership</masterLabel>
+        <translation><!-- Pays LP Membership --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

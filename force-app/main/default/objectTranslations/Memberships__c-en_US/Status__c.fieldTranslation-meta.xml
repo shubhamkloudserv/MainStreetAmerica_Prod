@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Transaction Status --></label>
+    <name>Status__c</name>
+    <picklistValues>
+        <masterLabel>CANCELLED</masterLabel>
+        <translation><!-- CANCELLED --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>FAILED</masterLabel>
+        <translation><!-- FAILED --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>PENDING</masterLabel>
+        <translation><!-- PENDING --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>REFUNDED</masterLabel>
+        <translation><!-- REFUNDED --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>SUCCEEDED</masterLabel>
+        <translation><!-- SUCCEEDED --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

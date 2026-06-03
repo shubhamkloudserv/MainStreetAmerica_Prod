@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Email_Org_Person__c</fullName>
+    <description>Stores combined email; used for unified communication.</description>
+    <externalId>false</externalId>
+    <formula>IF(
+    NOT(ISBLANK(Orgnanization_Email__c)),
+    Orgnanization_Email__c,
+    IF(
+        NOT(ISBLANK(PersonEmail)),
+        PersonEmail,
+        Primary_Contact_Email__c
+    )
+)</formula>
+    <label>Email (Org / Person)</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

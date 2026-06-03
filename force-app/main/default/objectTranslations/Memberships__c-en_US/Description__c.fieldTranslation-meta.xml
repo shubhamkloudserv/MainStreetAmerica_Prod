@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Description --></label>
+    <name>Description__c</name>
+    <picklistValues>
+        <masterLabel>Allied Mbrs General Join/Renew</masterLabel>
+        <translation><!-- Allied Mbrs General Join/Renew --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Designated Paid by CP non-def</masterLabel>
+        <translation><!-- Designated Paid by CP non-def --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Main St State Coordinator Pkg</masterLabel>
+        <translation><!-- Main St State Coordinator Pkg --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

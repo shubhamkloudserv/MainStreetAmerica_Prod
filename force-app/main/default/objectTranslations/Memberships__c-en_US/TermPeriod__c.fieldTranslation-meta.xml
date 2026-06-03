@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Term Period --></label>
+    <name>TermPeriod__c</name>
+    <picklistValues>
+        <masterLabel>DAY</masterLabel>
+        <translation><!-- DAY --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>LIFE</masterLabel>
+        <translation><!-- LIFE --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>MONTH</masterLabel>
+        <translation><!-- MONTH --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>WEEK</masterLabel>
+        <translation><!-- WEEK --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>YEAR</masterLabel>
+        <translation><!-- YEAR --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

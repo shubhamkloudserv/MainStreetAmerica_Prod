@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Membership_Transaction__c.Transaction_Name__c</field>
+    </columns>
+    <columns>
+        <field>Membership_Transaction__c.PaymentMethod__c</field>
+    </columns>
+    <columns>
+        <field>Membership_Transaction__c.TransactionCompletionDate__c</field>
+    </columns>
+    <columns>
+        <field>Membership_Transaction__c.TransactionDueDate__c</field>
+    </columns>
+    <description>Report to show all Transactions  where Last Modified Date is Today and modified by Kloudserv Client Care</description>
+    <filter>
+        <criteriaItems>
+            <column>CUST_LAST_UPDATE_NAME</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Kloudserv Client Care</value>
+        </criteriaItems>
+    </filter>
+    <format>Tabular</format>
+    <name>Membership Transaction Report</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntityAuditHistory$Membership_Transaction__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <sortColumn>Membership_Transaction__c.TransactionCompletionDate__c</sortColumn>
+    <sortOrder>Desc</sortOrder>
+    <timeFrameFilter>
+        <dateColumn>CUST_LAST_UPDATE</dateColumn>
+        <interval>INTERVAL_TODAY</interval>
+    </timeFrameFilter>
+</Report>

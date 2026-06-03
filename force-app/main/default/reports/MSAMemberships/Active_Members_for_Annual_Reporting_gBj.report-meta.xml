@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>ACCOUNT.NAME</field>
+    </columns>
+    <columns>
+        <field>FK_NAME</field>
+    </columns>
+    <columns>
+        <field>Account.Membership_Type__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Memberships__c.TermStartDate__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Memberships__c.TermEndDate__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Memberships__c.Membership_Status__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Memberships__c.Membership_Term__c</field>
+    </columns>
+    <columns>
+        <field>FK_$Memberships__c.MembershipTerm__c</field>
+    </columns>
+    <description>List of all Active Memberships where Membership Expiration is greater than 90days AGO.</description>
+    <filter>
+        <booleanFilter>1 AND 2</booleanFilter>
+        <criteriaItems>
+            <column>FK_$Memberships__c.Membership_Type__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>contains</operator>
+            <value>Main Street America Community Member,General Member,Start-up Member</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>FK_$Memberships__c.TermEndDate__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>greaterOrEqual</operator>
+            <value>N_DAYS_AGO:90</value>
+        </criteriaItems>
+    </filter>
+    <format>Tabular</format>
+    <name>Active Members for Annual Reporting</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>AccountList@Account.Membership__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <sortColumn>FK_$Memberships__c.TermEndDate__c</sortColumn>
+    <sortOrder>Desc</sortOrder>
+    <timeFrameFilter>
+        <dateColumn>DUE_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

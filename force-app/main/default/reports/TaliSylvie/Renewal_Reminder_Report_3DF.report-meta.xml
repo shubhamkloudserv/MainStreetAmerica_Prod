@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>EmailMessage.EmailMessageRelationRecipient$accountName</field>
+    </columns>
+    <columns>
+        <field>EmailMessage$FromAddress</field>
+    </columns>
+    <columns>
+        <field>EmailMessage$ToAddress</field>
+    </columns>
+    <columns>
+        <field>EmailMessage$Subject</field>
+    </columns>
+    <columns>
+        <field>EmailMessage$TextBody</field>
+    </columns>
+    <description>Report of all the Renewal Reminder Emails sent to Users</description>
+    <filter>
+        <criteriaItems>
+            <column>EmailMessage$Subject</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>It&apos;s Time to Renew Your Main Street America Membership!</value>
+        </criteriaItems>
+    </filter>
+    <format>Tabular</format>
+    <name>Renewal Reminder Report</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Email_Messages_with_HTML__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>false</showGrandTotal>
+    <showSubTotals>false</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>EmailMessage$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

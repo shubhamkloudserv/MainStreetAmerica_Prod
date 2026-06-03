@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Funding priorities --></label>
+    <name>Funding_priorities__c</name>
+    <picklistValues>
+        <masterLabel>Civic Infrastructure and Democracy</masterLabel>
+        <translation><!-- Civic Infrastructure and Democracy --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Climate Resilience</masterLabel>
+        <translation><!-- Climate Resilience --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Education</masterLabel>
+        <translation><!-- Education --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Intermediary Grantmaking</masterLabel>
+        <translation><!-- Intermediary Grantmaking --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Small Business</masterLabel>
+        <translation><!-- Small Business --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Sponsorship</masterLabel>
+        <translation><!-- Sponsorship --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Unrestricted</masterLabel>
+        <translation><!-- Unrestricted --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

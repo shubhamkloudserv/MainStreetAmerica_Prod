@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Memberships__c$Name</field>
+    </columns>
+    <columns>
+        <field>Memberships__c$Membership_Type__c</field>
+    </columns>
+    <columns>
+        <field>Memberships__c$Membership_Status__c</field>
+    </columns>
+    <columns>
+        <field>Memberships__c$TermStartDate__c</field>
+    </columns>
+    <columns>
+        <field>Memberships__c$TermEndDate__c</field>
+    </columns>
+    <description>List of Accounts with Active Memberships from the state of Georgia, with Membership Type as MSA Community Member, General Member, Start-Up Member.</description>
+    <filter>
+        <criteriaItems>
+            <column>Memberships__c$Related_Account_Billing_State_Province__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Georgia</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Memberships__c$Membership_Status__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Queued,Membership Activated,In Grace Period</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Memberships__c$Membership_Type__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>contains</operator>
+            <value>Main Street America Community Member,General Member,Start-up Member</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Memberships__c$Related_Account_Billing_State_Province__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Memberships__c$Related_Account__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Accounts of Georgia State Report</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Membership_Account__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>false</showGrandTotal>
+    <showSubTotals>false</showSubTotals>
+    <sortColumn>Memberships__c$TermEndDate__c</sortColumn>
+    <sortOrder>Desc</sortOrder>
+    <timeFrameFilter>
+        <dateColumn>Memberships__c$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

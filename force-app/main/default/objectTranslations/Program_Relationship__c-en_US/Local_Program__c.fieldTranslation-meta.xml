@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Local Program --></label>
+    <lookupFilter>
+        <errorMessage><!-- The selected Account should be a Local Program --></errorMessage>
+    </lookupFilter>
+    <name>Local_Program__c</name>
+    <relationshipLabel><!-- Program Relationships (Local Program) --></relationshipLabel>
+</CustomFieldTranslation>

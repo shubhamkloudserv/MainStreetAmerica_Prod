@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Order__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Links the transaction to the related order; used for order-to-payment tracking.</description>
+    <label>Order</label>
+    <referenceTo>Order</referenceTo>
+    <relationshipLabel>Membership Transactions</relationshipLabel>
+    <relationshipName>Membership_Transactions</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- CP Payment Category --></label>
+    <name>CP_Payment_Category__c</name>
+    <picklistValues>
+        <masterLabel>Paid by CP ACH</masterLabel>
+        <translation><!-- Paid by CP ACH --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Paid by CP Check</masterLabel>
+        <translation><!-- Paid by CP Check --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Paid by CP Contract</masterLabel>
+        <translation><!-- Paid by CP Contract --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

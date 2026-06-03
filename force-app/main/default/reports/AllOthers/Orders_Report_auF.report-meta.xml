@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>ORDER_NUMBER</field>
+    </columns>
+    <columns>
+        <field>ACCOUNT_NAME</field>
+    </columns>
+    <columns>
+        <field>UPDATEDBY.NAME</field>
+    </columns>
+    <columns>
+        <field>Account.Account_Id__c</field>
+    </columns>
+    <columns>
+        <field>Order.Enrollment_Id__c</field>
+    </columns>
+    <description>List of all the Orders created post Jan 1st 2026.</description>
+    <format>Tabular</format>
+    <name>Orders Report</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>OrderList</reportType>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>ORDER_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+        <startDate>2026-01-01</startDate>
+    </timeFrameFilter>
+</Report>

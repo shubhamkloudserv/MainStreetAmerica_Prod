@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Notification Status --></label>
+    <name>Notification_Status__c</name>
+    <picklistValues>
+        <masterLabel>Day 1 Sent</masterLabel>
+        <translation><!-- Day 1 Sent --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Day 30 Sent</masterLabel>
+        <translation><!-- Day 30 Sent --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Day 60 Sent</masterLabel>
+        <translation><!-- Day 60 Sent --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Day 90 Sent</masterLabel>
+        <translation><!-- Day 90 Sent --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Termination Sent</masterLabel>
+        <translation><!-- Termination Sent --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>GiftTransaction$Donor</field>
+    </columns>
+    <columns>
+        <field>GiftTransaction$Name</field>
+    </columns>
+    <columns>
+        <field>GiftTransaction$PaymentMethod</field>
+    </columns>
+    <columns>
+        <field>GiftTransaction$TransactionDate</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Sum</aggregateTypes>
+        <field>GiftTransaction$OriginalAmount</field>
+    </columns>
+    <description>This reports pull data of all transaction from current financial year.</description>
+    <format>Tabular</format>
+    <name>All Donations Current FY</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Gift_Transaction__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <sortColumn>GiftTransaction$TransactionDate</sortColumn>
+    <sortOrder>Desc</sortOrder>
+    <timeFrameFilter>
+        <dateColumn>GiftTransaction$AcknowledgementDate</dateColumn>
+        <interval>INTERVAL_CURFY</interval>
+    </timeFrameFilter>
+</Report>

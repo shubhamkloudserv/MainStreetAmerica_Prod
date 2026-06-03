@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Donor__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicates donor status that this account made some donation; used alongside membership tracking.</description>
+    <inlineHelpText>Check this box if receive or have received donations from this account.</inlineHelpText>
+    <label>Is Donor</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

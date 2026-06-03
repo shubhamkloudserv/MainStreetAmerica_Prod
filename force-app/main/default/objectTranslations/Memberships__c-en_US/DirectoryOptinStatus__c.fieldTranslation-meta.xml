@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Directory Opt-in Status --></label>
+    <name>DirectoryOptinStatus__c</name>
+    <picklistValues>
+        <masterLabel>Automatically Opted In</masterLabel>
+        <translation><!-- Automatically Opted In --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Opted In</masterLabel>
+        <translation><!-- Opted In --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Opted Out</masterLabel>
+        <translation><!-- Opted Out --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

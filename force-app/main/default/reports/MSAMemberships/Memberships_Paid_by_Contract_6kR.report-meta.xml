@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Membership_Transaction__c.Account_Id__c</field>
+    </columns>
+    <columns>
+        <field>Invoice__c.Bill_To_Account__c</field>
+    </columns>
+    <columns>
+        <field>Membership_Transaction__c.Membership_Level__c</field>
+    </columns>
+    <columns>
+        <field>Membership_Transaction__c.Membership_Term_End_Date__c</field>
+    </columns>
+    <columns>
+        <field>Membership_Transaction__c.PaymentMethod__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Sum</aggregateTypes>
+        <field>Invoice__c.Invoice_Amount__c</field>
+    </columns>
+    <columns>
+        <field>Invoice__c.Billing_City__c</field>
+    </columns>
+    <columns>
+        <field>Invoice__c.Billing_State_Province__c</field>
+    </columns>
+    <columns>
+        <field>Invoice__c.Status__c</field>
+    </columns>
+    <description>This report shows all paid membership invoices where the payment method is Contract. It includes details such as the billing account, membership level (e.g., Coordinating Program Member, General Member), membership term end date, invoice amount, billing l</description>
+    <filter>
+        <criteriaItems>
+            <column>Membership_Transaction__c.PaymentMethod__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Contract</value>
+        </criteriaItems>
+    </filter>
+    <format>Tabular</format>
+    <name>Memberships Paid by Contract</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntityCustomEntity$Invoice__c$Membership_Transaction__c@Membership_Transaction__c.Payment_Instrument__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Membership_Transaction__c.TransactionCompletionDate__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>
