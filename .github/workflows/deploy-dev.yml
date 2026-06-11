@@ -31,9 +31,9 @@ jobs:
       - name: Deploy to msa_dev Org
         run: |
           sf project deploy start \
-            --source-dir force-app \
+            --manifest package/package.xml \
             --target-org FRVer1 \
-            --wait 10
+            --wait 60
 
       # 5. (Optional) Run Apex Test
       - name: Run Apex Tests
@@ -41,4 +41,4 @@ jobs:
           sf apex run test \
             --target-org FRVer1 \
             --result-format human \
-            --wait 10
+            --wait 20
