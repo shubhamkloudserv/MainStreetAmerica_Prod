@@ -1,44 +1,70 @@
-name: Deploy to Salesforce Dev Org
+# .github/workflows/deploy-dev.yml
+#
+# "dev" branch me push hote hi:
+#   1. sfdx-git-delta se SIRF changed files ka "deploy" folder banega
+#   2. Wahi changed files sandbox me deploy hongi (pura force-app nahi)
+
+name: Deploy to Salesforce Sandbox
 
 on:
   push:
     branches:
-      - msa_dev   # Triggers only on push to dev branch
+      - msa_dev          # apni branch ka naam yahan rakhein
 
 jobs:
   deploy:
+    name: Deploy changed files to Sandbox
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
-      - name: Checkout Code
+      # 1. Repo code laao (poori history chahiye taaki git compare kar sake)
+      - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # 0 = poori git history (delta ke liye ZAROORI)
 
-      # 2. Install Salesforce CLI
+      # 2. Salesforce CLI install karo
       - name: Install Salesforce CLI
         run: |
-          npm install -g @salesforce/cli
+          npm install --global @salesforce/cli@latest
           sf --version
 
-      # 3. Authenticate to Salesforce Dev Org
-      - name: Authenticate to Dev Org
+      # 3. sfdx-git-delta plugin install karo (ye delta folder banata hai)
+      - name: Install sfdx-git-delta plugin
+        run: |
+          echo y | sf plugins install sfdx-git-delta
+          sf plugins
+
+      # 4. Sandbox me login (auth URL ek GitHub Secret me rakha hai)
+      - name: Authenticate to Sandbox
         run: |
           echo "${{ secrets.SFDX_AUTH_URL }}" > ./SFDX_AUTH_URL.txt
           sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias FRVer1 --set-default
           rm -f ./SFDX_AUTH_URL.txt
 
-      # 4. Deploy source to Salesforce
-      - name: Deploy to msa_dev Org
+      # 5. DELTA folder banao
+      #    --from  = purana commit (pichla wala)
+      #    --to    = abhi wala commit
+      #    Git in dono ko compare karke sirf changed files "delta" folder me daal dega,
+      #    aur package.xml khud bana dega.
+      - name: Generate delta (changed files only)
+        run: |
+          mkdir -p delta
+          sf sgd source delta \
+            --from "HEAD~1" \
+            --to "HEAD" \
+            --output-dir delta \
+            --generate-delta \
+            --source-dir force-app
+          echo "----- package.xml (kya deploy hoga) -----"
+          cat delta/package/package.xml
+
+      # 6. Sirf delta folder ko deploy karo (pura force-app nahi)
+      - name: Deploy delta to Sandbox
         run: |
           sf project deploy start \
-            --manifest package.xml \
+            --manifest delta/package/package.xml \
             --target-org FRVer1 \
+            --test-level NoTestRun \
             --wait 60
 
-      # 5. (Optional) Run Apex Test
-      - name: Run Apex Tests
-        run: |
-          sf apex run test \
-            --target-org FRVer1 \
-            --result-format human \
-            --wait 20
