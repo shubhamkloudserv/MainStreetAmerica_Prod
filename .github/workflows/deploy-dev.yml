@@ -35,7 +35,7 @@ jobs:
             --target-org FRVer1 \
             --wait 10
 
-      # 5. (Optional) Run Apex Tests
+      # 5. (Optional) Run Apex Test
       - name: Run Apex Tests
         run: |
           sf apex run test \
