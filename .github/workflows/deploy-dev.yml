@@ -31,7 +31,7 @@ jobs:
       - name: Deploy to msa_dev Org
         run: |
           sf project deploy start \
-            --manifest package/package.xml \
+            --manifest package.xml \
             --target-org FRVer1 \
             --wait 60
 
