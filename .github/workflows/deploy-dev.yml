@@ -24,7 +24,7 @@ jobs:
       - name: Authenticate to Dev Org
         run: |
           echo "${{ secrets.SFDX_AUTH_URL }}" > ./SFDX_AUTH_URL.txt
-          sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias myOrg --set-default
+          sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias FRVer1 --set-default
           rm -f ./SFDX_AUTH_URL.txt
 
       # 4. Deploy source to Salesforce
@@ -32,13 +32,13 @@ jobs:
         run: |
           sf project deploy start \
             --source-dir force-app \
-            --target-org myOrg \
+            --target-org FRVer1 \
             --wait 10
 
       # 5. (Optional) Run Apex Tests
       - name: Run Apex Tests
         run: |
           sf apex run test \
-            --target-org myOrg \
+            --target-org FRVer1 \
             --result-format human \
             --wait 10
