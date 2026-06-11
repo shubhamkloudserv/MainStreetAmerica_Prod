@@ -1,0 +1,44 @@
+name: Deploy to Salesforce Dev Org
+
+on:
+  push:
+    branches:
+      - msa_dev   # Triggers only on push to dev branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Install Salesforce CLI
+      - name: Install Salesforce CLI
+        run: |
+          npm install -g @salesforce/cli
+          sf --version
+
+      # 3. Authenticate to Salesforce Dev Org
+      - name: Authenticate to Dev Org
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > ./SFDX_AUTH_URL.txt
+          sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias myOrg --set-default
+          rm -f ./SFDX_AUTH_URL.txt
+
+      # 4. Deploy source to Salesforce
+      - name: Deploy to msa_dev Org
+        run: |
+          sf project deploy start \
+            --source-dir force-app \
+            --target-org myOrg \
+            --wait 10
+
+      # 5. (Optional) Run Apex Tests
+      - name: Run Apex Tests
+        run: |
+          sf apex run test \
+            --target-org myOrg \
+            --result-format human \
+            --wait 10
