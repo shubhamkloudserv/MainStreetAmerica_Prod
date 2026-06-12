@@ -33,6 +33,12 @@ jobs:
           sf plugins install sfdx-git-delta
           sf plugins --core
 
+      - name: Check SGD Commands
+        run: |
+          sf plugins
+          sf commands | grep delta || true
+          sf commands | grep sgd || true
+
       - name: Create delta package
         run: |
           mkdir -p changed-sources
