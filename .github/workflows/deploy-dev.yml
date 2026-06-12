@@ -2,39 +2,63 @@ name: Deploy to frver1 environment on push to msa_dev
 
 on:
   push:
-    branches: [ msa_dev ]
+    branches:
+      - msa_dev
     paths:
       - 'force-app/**'
 
 jobs:
   Deploy-to-frver1-environment:
-      runs-on: ubuntu-latest
-      environment: frver1
-      steps:
-          - uses: actions/setup-node@v3
-            with:
-              node-version: '18'
-          - name: 'Checkout source code'
-            uses: actions/checkout@v3
-            with:
-              fetch-depth: '2'
-                
-          # Now Install Salesforce CLI
-          - name: 'Install sfdx'
-            run: npm install @salesforce/cli --global
-          - name: 'Installing sfdx git delta'
-            run: | 
-                echo Y | sf plugins install sfdx-git-delta@latest
-                sf plugins
+    runs-on: ubuntu-latest
+    environment: frver1
 
-          - name: 'Create delta packages'
-            run: | 
-                mkdir changed-sources
-                sf sgd source delta --to "HEAD" --from "HEAD~1" --output changed-sources/ --generate-delta --source force-app/
-                echo "[INFO] Diff generated"
-                
-          - name: 'Deploy to environment with running all local tests'
-            run: |
-                echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
-                sf org login jwt --username ${{ secrets.DEPLOYMENT_USER_NAME }} --jwt-key-file server.key --client-id ${{ secrets.CONSUMER_KEY }} --instance-url ${{ vars.INSTANCE_URL }} --set-default
-                sf project deploy start --source-dir changed-sources/force-app --test-level RunLocalTests
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Salesforce CLI
+        run: |
+          npm install -g @salesforce/cli
+          sf --version
+
+      - name: Install SFDX Git Delta
+        run: |
+          sf plugins install sfdx-git-delta
+          sf plugins --core
+
+      - name: Create delta package
+        run: |
+          mkdir -p changed-sources
+
+          sf sgd source delta \
+            --from HEAD~1 \
+            --to HEAD \
+            --output-dir changed-sources \
+            --generate-delta \
+            --source-dir force-app
+
+          ls -R changed-sources
+
+      - name: Authenticate Org
+        run: |
+          echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
+
+          sf org login jwt \
+            --username "${{ secrets.DEPLOYMENT_USER_NAME }}" \
+            --jwt-key-file server.key \
+            --client-id "${{ secrets.CONSUMER_KEY }}" \
+            --instance-url "${{ vars.INSTANCE_URL }}" \
+            --set-default
+
+      - name: Deploy Delta
+        run: |
+          sf project deploy start \
+            --source-dir changed-sources/force-app \
+            --test-level RunLocalTests
