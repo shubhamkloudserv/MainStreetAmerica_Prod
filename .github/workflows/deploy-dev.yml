@@ -1,70 +1,40 @@
-# .github/workflows/deploy-dev.yml
-#
-# "dev" branch me push hote hi:
-#   1. sfdx-git-delta se SIRF changed files ka "deploy" folder banega
-#   2. Wahi changed files sandbox me deploy hongi (pura force-app nahi)
-
-name: Deploy to Salesforce Sandbox
+name: Deploy to frver1 environment on push to main
 
 on:
   push:
-    branches:
-      - msa_dev          # apni branch ka naam yahan rakhein
+    branches: [ msa_dev ]
+    paths:
+      - 'force-app/**'
 
 jobs:
-  deploy:
-    name: Deploy changed files to Sandbox
-    runs-on: ubuntu-latest
+  Deploy-to-frver1-environment:
+      runs-on: ubuntu-latest
+      environment: frver1
+      steps:
+          - uses: actions/setup-node@v3
+            with:
+              node-version: '18'
+          - name: 'Checkout source code'
+            uses: actions/checkout@v3
+            with:
+              fetch-depth: '2'
+                
+          # Now Install Salesforce CLI
+          - name: 'Install sfdx'
+            run: npm install @salesforce/cli --global
+          - name: 'Installing sfdx git delta'
+            run: | 
+                echo Y | sfdx plugins:install sfdx-git-delta
+                sfdx plugins
 
-    steps:
-      # 1. Repo code laao (poori history chahiye taaki git compare kar sake)
-      - name: Checkout source code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0   # 0 = poori git history (delta ke liye ZAROORI)
-
-      # 2. Salesforce CLI install karo
-      - name: Install Salesforce CLI
-        run: |
-          npm install --global @salesforce/cli@latest
-          sf --version
-
-      # 3. sfdx-git-delta plugin install karo (ye delta folder banata hai)
-      - name: Install sfdx-git-delta plugin
-        run: |
-          echo y | sf plugins install sfdx-git-delta
-          sf plugins
-
-      # 4. Sandbox me login (auth URL ek GitHub Secret me rakha hai)
-      - name: Authenticate to Sandbox
-        run: |
-          echo "${{ secrets.SFDX_AUTH_URL }}" > ./SFDX_AUTH_URL.txt
-          sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias FRVer1 --set-default
-          rm -f ./SFDX_AUTH_URL.txt
-
-      # 5. DELTA folder banao
-      #    --from  = purana commit (pichla wala)
-      #    --to    = abhi wala commit
-      #    Git in dono ko compare karke sirf changed files "delta" folder me daal dega,
-      #    aur package.xml khud bana dega.
-      - name: Generate delta (changed files only)
-        run: |
-          mkdir -p delta
-          sf sgd source delta \
-            --from "HEAD~1" \
-            --to "HEAD" \
-            --output-dir delta \
-            --generate-delta \
-            --source-dir force-app
-          echo "----- package.xml (kya deploy hoga) -----"
-          cat delta/package/package.xml
-
-      # 6. Sirf delta folder ko deploy karo (pura force-app nahi)
-      - name: Deploy delta to Sandbox
-        run: |
-          sf project deploy start \
-            --manifest delta/package/package.xml \
-            --target-org FRVer1 \
-            --test-level NoTestRun \
-            --wait 60
-
+          - name: 'Create delta packages'
+            run: | 
+                mkdir changed-sources
+                sf sgd source delta --to "HEAD" --from "HEAD~1" --output changed-sources/ --generate-delta --source force-app/
+                echo "[INFO] Diff generated"
+                
+          - name: 'Deploy to environment with running all local tests'
+            run: |
+                echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
+                sf org login jwt --username ${{ secrets.DEPLOYMENT_USER_NAME }} --jwt-key-file server.key --client-id ${{ secrets.CONSUMER_KEY }} --instance-url ${{ vars.INSTANCE_URL }} --set-default
+                sf project deploy start --source-dir changed-sources/force-app --test-level RunLocalTests
