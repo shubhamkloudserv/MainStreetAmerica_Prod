@@ -1,4 +1,4 @@
-name: Deploy to frver1 environment on push to main
+name: Deploy to frver1 environment on push to msa_dev
 
 on:
   push:
