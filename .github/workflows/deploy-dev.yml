@@ -16,7 +16,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -30,7 +30,7 @@ jobs:
 
       - name: Install SFDX Git Delta
         run: |
-          echo y | sf plugins install sfdx-git-delta
+          sf plugins install sfdx-git-delta -f
           sf plugins --core
 
       - name: Check SGD Commands
@@ -38,6 +38,19 @@ jobs:
           sf plugins
           sf commands | grep delta || true
           sf commands | grep sgd || true
+
+      - name: Create delta package
+        run: |
+          mkdir -p changed-sources
+
+          sf sgd source delta \
+            --from HEAD~1 \
+            --to HEAD \
+            --output-dir changed-sources \
+            --generate-delta \
+            --source-dir force-app
+
+          ls -R changed-sources
 
       - name: Authenticate Org
         run: |
@@ -53,4 +66,5 @@ jobs:
       - name: Deploy Delta
         run: |
           sf project deploy start \
+            --source-dir changed-sources/force-app \
             --test-level RunLocalTests
