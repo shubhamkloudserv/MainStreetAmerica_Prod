@@ -29,9 +29,11 @@ jobs:
           sf --version
 
       - name: Install SFDX Git Delta
+        env:
+          SF_SKIP_PLUGINS_PROMPT: true
         run: |
-          sf plugins install sfdx-git-delta -f
-          sf plugins --core
+          sf plugins install sfdx-git-delta
+          sf plugins
 
       - name: Check SGD Commands
         run: |
