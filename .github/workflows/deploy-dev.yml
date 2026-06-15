@@ -30,19 +30,55 @@ jobs:
         run: |
           echo 'y' | sf plugins install sfdx-git-delta
 
-      # Step 5: Authenticate to the target Sandbox
-      - name: Authenticate to Salesforce Sandbox
+      # Step 5: Authenticate to the target Sandbox using JWT (no sfdx auth URL)
+      - name: Authenticate to Salesforce Sandbox (JWT)
+        shell: bash
         run: |
-          echo "${{ secrets.SFDX_AUTH_URL }}" > sfdx_auth.txt
-          sf org login sfdx-url --sfdx-url-file sfdx_auth.txt --set-default --alias sandbox
-          rm sfdx_auth.txt
+          set -euo pipefail
+
+          # fail fast if required secrets are missing
+          if [ -z "${{ secrets.JWT_SERVER_KEY }}" ]; then
+            echo "ERROR: secrets.JWT_SERVER_KEY is not set" >&2
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOYMENT_USER_NAME }}" ]; then
+            echo "ERROR: secrets.DEPLOYMENT_USER_NAME is not set" >&2
+            exit 1
+          fi
+          if [ -z "${{ secrets.CONSUMER_KEY }}" ]; then
+            echo "ERROR: secrets.CONSUMER_KEY is not set" >&2
+            exit 1
+          fi
+
+          # write private key to file with strict permissions
+          echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
+          chmod 600 server.key
+
+          # prefer secret INSTANCE_URL (if set), otherwise fall back to workflow var
+          if [ -n "${{ secrets.INSTANCE_URL }}" ]; then
+            INSTANCE_URL_VALUE="${{ secrets.INSTANCE_URL }}"
+          else
+            INSTANCE_URL_VALUE="${{ vars.INSTANCE_URL }}"
+          fi
+
+          sf org login jwt \
+            --username "${{ secrets.DEPLOYMENT_USER_NAME }}" \
+            --jwt-key-file server.key \
+            --client-id "${{ secrets.CONSUMER_KEY }}" \
+            --instance-url "${INSTANCE_URL_VALUE}" \
+            --set-default --alias sandbox
 
       # Step 6: Generate the delta metadata package
       - name: Generate Delta Changes
         run: |
           mkdir changed-sources
           # Compares current commit (HEAD) against previous commit (HEAD~)
-          sf sgd source delta --to "HEAD" --from "HEAD~1" --output changed-sources/
+          sf sgd source delta \
+            --from HEAD~1 \
+            --to HEAD \
+            --output-dir changed-sources \
+            --generate-delta \
+            --source-dir force-app
 
       # Step 7: Deploy delta changes if they exist
       - name: Deploy Delta to Sandbox
@@ -62,3 +98,9 @@ jobs:
           else
             echo "No deleted metadata detected."
           fi
+
+      # Step 9: Cleanup sensitive files
+      - name: Cleanup server key
+        if: always()
+        run: |
+          rm -f server.key || true
