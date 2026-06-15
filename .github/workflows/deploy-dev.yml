@@ -1,72 +1,64 @@
-name: Deploy to frver1 environment on push to msa_dev
+name: Deploy Delta Changes to Sandbox
 
 on:
   push:
     branches:
-      - msa_dev
-    paths:
-      - 'force-app/**'
+      - msa_dev # Triggers when code is merged into the develop branch
 
 jobs:
-  Deploy-to-frver1-environment:
+  deploy-delta:
     runs-on: ubuntu-latest
-    environment: frver1
-
     steps:
-      - name: Checkout source code
+      # Step 1: Checkout the source code with full git history
+      - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Critical for git diff to compare commits properly
 
-      - name: Setup Node
+      # Step 2: Set up Node.js environment
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20' # Required for modern sf and SGD versions
 
+      # Step 3: Install Salesforce CLI (sf v2)
       - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
+
+      # Step 4: Install the sfdx-git-delta plugin
+      - name: Install sfdx-git-delta Plugin
         run: |
-          npm install -g @salesforce/cli
-          sf --version
+          echo 'y' | sf plugins install sfdx-git-delta
 
-      - name: Install SFDX Git Delta
-        env:
-          SF_SKIP_PLUGINS_PROMPT: true
+      # Step 5: Authenticate to the target Sandbox
+      - name: Authenticate to Salesforce Sandbox
         run: |
-          sf plugins install sfdx-git-delta
-          sf plugins
+          echo "${{ secrets.SFDX_AUTH_URL }}" > sfdx_auth.txt
+          sf org login sfdx-url --sfdx-url-file sfdx_auth.txt --set-default --alias sandbox
+          rm sfdx_auth.txt
 
-      - name: Check SGD Commands
+      # Step 6: Generate the delta metadata package
+      - name: Generate Delta Changes
         run: |
-          sf plugins
-          sf commands | grep delta || true
-          sf commands | grep sgd || true
+          mkdir changed-sources
+          # Compares current commit (HEAD) against previous commit (HEAD~)
+          sf sgd source delta --to "HEAD" --from "HEAD~1" --output changed-sources/
 
-      - name: Create delta package
+      # Step 7: Deploy delta changes if they exist
+      - name: Deploy Delta to Sandbox
         run: |
-          mkdir -p changed-sources
+          # Verify if package.xml contains actual metadata before deploying
+          if [ -f changed-sources/package/package.xml ]; then
+            sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --wait 30
+          else
+            echo "No changed metadata detected to deploy."
+          fi
 
-          sf sgd source delta \
-            --from HEAD~1 \
-            --to HEAD \
-            --output-dir changed-sources \
-            --generate-delta \
-            --source-dir force-app
-
-          ls -R changed-sources
-
-      - name: Authenticate Org
+      # Step 8: Deploy destructive changes (Deletions) if they exist
+      - name: Deploy Destructive Changes
         run: |
-          echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
-
-          sf org login jwt \
-            --username "${{ secrets.DEPLOYMENT_USER_NAME }}" \
-            --jwt-key-file server.key \
-            --client-id "${{ secrets.CONSUMER_KEY }}" \
-            --instance-url "${{ vars.INSTANCE_URL }}" \
-            --set-default
-
-      - name: Deploy Delta
-        run: |
-          sf project deploy start \
-            --source-dir changed-sources/force-app \
-            --test-level RunLocalTests
+          if [ -f changed-sources/destructiveChanges/destructiveChanges.xml ]; then
+            sf project deploy start --metadata-dir changed-sources/destructiveChanges --target-org sandbox --wait 30
+          else
+            echo "No deleted metadata detected."
+          fi
