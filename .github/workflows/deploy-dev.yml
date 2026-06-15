@@ -74,8 +74,8 @@ jobs:
           mkdir changed-sources
           # Compares current commit (HEAD) against previous commit (HEAD~)
           sf sgd source delta \
-            --from HEAD~1 \
-            --to HEAD \
+            --from ${{ github.event.before }} \
+            --to ${{ github.sha }} \
             --output-dir changed-sources \
             --generate-delta \
             --source-dir force-app
@@ -84,7 +84,7 @@ jobs:
       - name: Deploy Delta to Sandbox
         run: |
           # Verify if package.xml contains actual metadata before deploying
-          if [ -f changed-sources/package/package.xml ]; then
+          if grep -q "<types>" changed-sources/package/package.xml; then
             sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --wait 30
           else
             echo "No changed metadata detected to deploy."
