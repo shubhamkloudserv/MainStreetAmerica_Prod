@@ -1,0 +1,100 @@
+name: Deploy Delta Changes to Sandbox
+
+on:
+  push:
+    branches:
+      - msa_dev # Triggers when code is merged into the msa_dev branch
+
+jobs:
+  deploy-delta:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the source code with full git history
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Critical for git diff to compare commits properly
+
+      # Step 2: Set up Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Required for modern sf and SGD versions
+
+      # Step 3: Install Salesforce CLI (sf v2)
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
+
+      # Step 4: Install the sfdx-git-delta plugin
+      - name: Install sfdx-git-delta Plugin
+        run: |
+          echo 'y' | sf plugins install sfdx-git-delta
+
+      # Step 5: Authenticate to the target Sandbox using JWT (no sfdx auth URL)
+      - name: Authenticate to Salesforce Sandbox (JWT)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # fail fast if required secrets are missing
+          if [ -z "${{ secrets.JWT_SERVER_KEY }}" ]; then
+            echo "ERROR: secrets.JWT_SERVER_KEY is not set" >&2
+            exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOYMENT_USER_NAME }}" ]; then
+            echo "ERROR: secrets.DEPLOYMENT_USER_NAME is not set" >&2
+            exit 1
+          fi
+          if [ -z "${{ secrets.CONSUMER_KEY }}" ]; then
+            echo "ERROR: secrets.CONSUMER_KEY is not set" >&2
+            exit 1
+          fi
+
+          # write private key to file with strict permissions
+          echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
+          chmod 600 server.key
+
+          # prefer secret INSTANCE_URL (if set), otherwise fall back to workflow var
+          if [ -n "${{ secrets.INSTANCE_URL }}" ]; then
+            INSTANCE_URL_VALUE="${{ secrets.INSTANCE_URL }}"
+          else
+            INSTANCE_URL_VALUE="${{ vars.INSTANCE_URL }}"
+          fi
+
+          sf org login jwt \
+            --username "${{ secrets.DEPLOYMENT_USER_NAME }}" \
+            --jwt-key-file server.key \
+            --client-id "${{ secrets.CONSUMER_KEY }}" \
+            --instance-url "${INSTANCE_URL_VALUE}" \
+            --set-default --alias sandbox
+
+      # Step 6: Generate the delta metadata package
+      - name: Generate Delta Changes
+        run: |
+          mkdir changed-sources
+          # Compares current commit (HEAD) against previous commit (HEAD~)
+          sf sgd source delta \
+            --from ${{ github.event.before }} \
+            --to ${{ github.sha }} \
+            --output-dir changed-sources \
+            --generate-delta \
+            --source-dir force-app
+
+      # Step 7: Deploy delta changes if they exist
+      - name: Deploy Delta to Sandbox
+        run: |
+          # Verify if package.xml contains actual metadata before deploying
+          if grep -q "<types>" changed-sources/package/package.xml; then
+            sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --test-level RunSpecifiedTests --tests ${{ vars.TEST_CLASSES }} --wait 30
+          else
+            echo "No changed metadata detected to deploy."
+          fi
+
+      # Step 8: Deploy deleted changes if they exist
+      - name: Deploy Destructive Changes
+        run: |
+          if [ -f changed-sources/destructiveChanges/destructiveChanges.xml ]; then
+            sf project deploy start --metadata-dir changed-sources/destructiveChanges --target-org sandbox --wait 30
+          else
+            echo "No deleted metadata detected."
+          fi
