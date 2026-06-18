@@ -3,7 +3,7 @@ name: Deploy Delta Changes to Sandbox
 on:
   push:
     branches:
-      - msa_dev # Triggers when code is merged into the develop branch
+      - msa_dev # Triggers when code is merged into the msa_dev branch
 
 jobs:
   deploy-delta:
@@ -85,12 +85,12 @@ jobs:
         run: |
           # Verify if package.xml contains actual metadata before deploying
           if grep -q "<types>" changed-sources/package/package.xml; then
-            sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --wait 30
+            sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --test-level RunSpecifiedTests --tests ${{ vars.TEST_CLASSES }} --wait 30
           else
             echo "No changed metadata detected to deploy."
           fi
 
-      # Step 8: Deploy destructive changes (Deletions) if they exist
+      # Step 8: Deploy deleted changes if they exist
       - name: Deploy Destructive Changes
         run: |
           if [ -f changed-sources/destructiveChanges/destructiveChanges.xml ]; then
@@ -98,9 +98,3 @@ jobs:
           else
             echo "No deleted metadata detected."
           fi
-
-      # Step 9: Cleanup sensitive files
-      - name: Cleanup server key
-        if: always()
-        run: |
-          rm -f server.key || true
