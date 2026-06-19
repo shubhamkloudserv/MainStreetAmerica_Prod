@@ -1,4 +1,4 @@
-name: Deploy Delta Changes to Staging
+name: Deploy Delta Changes to Staging Sandbox
 
 on:
   push:

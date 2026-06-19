@@ -1,4 +1,4 @@
-name: Deploy Delta Changes to Production
+name: Deploy Delta Changes to MSA Production
 
 on:
   push:
@@ -98,7 +98,7 @@ jobs:
               --metadata-dir changed-sources/destructiveChanges \
               --target-org prod \
               --wait 60
-              
+
           else
             echo "No deleted metadata detected."
           fi
