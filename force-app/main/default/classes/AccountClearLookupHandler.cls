@@ -2,7 +2,7 @@ public class AccountClearLookupHandler {
     public static Boolean isProcessing = false;
     
     public static void clearAccountReferences(Set<Id> accountIds) {
-        
+        System.debug('hello');
         List<SObject> recordsToUpdate = new List<SObject>();
         
         // 1. Clear Account__c reference from Invoice__c records
