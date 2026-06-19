@@ -82,8 +82,7 @@ jobs:
             sf project deploy start \
               --manifest changed-sources/package/package.xml \
               --target-org prod \
-              --test-level RunSpecifiedTests \
-              --tests "${{ vars.PROD_TEST_CLASSES }}" \
+              --test-level RunLocalTests \
               --wait 60
 
           else

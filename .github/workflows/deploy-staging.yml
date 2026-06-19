@@ -82,8 +82,7 @@ jobs:
             sf project deploy start \
               --manifest changed-sources/package/package.xml \
               --target-org staging \
-              --test-level RunSpecifiedTests \
-              --tests "${{ vars.STAGING_TEST_CLASSES }}" \
+              --test-level RunLocalTests \
               --wait 30
 
           else
