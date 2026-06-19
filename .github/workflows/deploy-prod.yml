@@ -3,7 +3,7 @@ name: Deploy Delta Changes to MSA Production
 on:
   push:
     branches:
-      - main
+      - msa_staging # Triggers when code is merged into the msa_staging branch
 
 jobs:
   deploy-delta:
