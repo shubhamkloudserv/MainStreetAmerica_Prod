@@ -1,9 +1,9 @@
-name: Deploy Delta Changes to Staging Sandbox
+name: Deploy Delta Changes to Sandbox (msa_dev (dev org) -> msa_staging (UAT org))
 
 on:
   push:
     branches:
-      - msa_staging
+      - msa_staging # Triggers when code is merged into the msa_staging branch
 
 jobs:
   deploy-delta:
@@ -82,8 +82,7 @@ jobs:
             sf project deploy start \
               --manifest changed-sources/package/package.xml \
               --target-org staging \
-              --test-level RunSpecifiedTests \
-              --tests "${{ vars.STAGING_TEST_CLASSES }}" \
+              --test-level RunLocalTests \
               --wait 30
 
           else

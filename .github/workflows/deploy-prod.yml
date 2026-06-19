@@ -3,7 +3,7 @@ name: Deploy Delta Changes to MSA Production
 on:
   push:
     branches:
-      - main
+      - main # Triggers when code is merged into the main branch
 
 jobs:
   deploy-delta:
@@ -82,8 +82,7 @@ jobs:
             sf project deploy start \
               --manifest changed-sources/package/package.xml \
               --target-org prod \
-              --test-level RunSpecifiedTests \
-              --tests "${{ vars.PROD_TEST_CLASSES }}" \
+              --test-level RunLocalTests \
               --wait 60
 
           else
