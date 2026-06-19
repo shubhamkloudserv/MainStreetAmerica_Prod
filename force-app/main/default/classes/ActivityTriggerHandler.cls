@@ -5,7 +5,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
     Map<Id, Account> accMap = new Map<Id, Account>();
     Map<Id, Account> parentAccMap = new Map<Id, Account>();
 
-    // Collect account ids from Tasks
+    // Collect account ids from Task
     public void collectAccountIdsFromTasks(List<Task> taskList){
         for(Task t : taskList){
             if(t.WhatId != null && String.valueOf(t.WhatId).startsWith('001')){
@@ -13,7 +13,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
             }
         }
     }
-	// Collect account ids from Events
+	// Collect account ids from Event
     public void collectAccountIdsFromEvents(List<Event> eventList){
         for(Event e : eventList){
             if(e.WhatId != null && String.valueOf(e.WhatId).startsWith('001')){
