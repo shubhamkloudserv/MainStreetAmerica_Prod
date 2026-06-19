@@ -41,12 +41,12 @@ jobs:
             echo "ERROR: secrets.JWT_SERVER_KEY is not set" >&2
             exit 1
           fi
-          if [ -z "${{ secrets.DEPLOYMENT_USER_NAME }}" ]; then
-            echo "ERROR: secrets.DEPLOYMENT_USER_NAME is not set" >&2
+          if [ -z "${{ secrets.DEV_USERNAME }}" ]; then
+            echo "ERROR: secrets.DEV_USERNAME is not set" >&2
             exit 1
           fi
-          if [ -z "${{ secrets.CONSUMER_KEY }}" ]; then
-            echo "ERROR: secrets.CONSUMER_KEY is not set" >&2
+          if [ -z "${{ secrets.DEV_CONSUMER_KEY }}" ]; then
+            echo "ERROR: secrets.DEV_CONSUMER_KEY is not set" >&2
             exit 1
           fi
 
@@ -54,17 +54,17 @@ jobs:
           echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
           chmod 600 server.key
 
-          # prefer secret INSTANCE_URL (if set), otherwise fall back to workflow var
-          if [ -n "${{ secrets.INSTANCE_URL }}" ]; then
-            INSTANCE_URL_VALUE="${{ secrets.INSTANCE_URL }}"
+          # prefer secret DEV_INSTANCE_URL (if set), otherwise fall back to workflow var
+          if [ -n "${{ secrets.DEV_INSTANCE_URL }}" ]; then
+            INSTANCE_URL_VALUE="${{ secrets.DEV_INSTANCE_URL }}"
           else
-            INSTANCE_URL_VALUE="${{ vars.INSTANCE_URL }}"
+            INSTANCE_URL_VALUE="${{ vars.DEV_INSTANCE_URL }}"
           fi
 
           sf org login jwt \
-            --username "${{ secrets.DEPLOYMENT_USER_NAME }}" \
+            --username "${{ secrets.DEV_USERNAME }}" \
             --jwt-key-file server.key \
-            --client-id "${{ secrets.CONSUMER_KEY }}" \
+            --client-id "${{ secrets.DEV_CONSUMER_KEY }}" \
             --instance-url "${INSTANCE_URL_VALUE}" \
             --set-default --alias sandbox
 
@@ -85,7 +85,7 @@ jobs:
         run: |
           # Verify if package.xml contains actual metadata before deploying
           if grep -q "<types>" changed-sources/package/package.xml; then
-            sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --test-level RunSpecifiedTests --tests ${{ vars.TEST_CLASSES }} --wait 30
+            sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --test-level RunSpecifiedTests --tests ${{ vars.DEV_TEST_CLASSES }} --wait 30
           else
             echo "No changed metadata detected to deploy."
           fi
