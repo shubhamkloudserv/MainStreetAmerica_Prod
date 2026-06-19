@@ -3,7 +3,7 @@ name: Deploy Delta Changes to Sandbox (msa_dev (dev org) -> msa_staging (UAT org
 on:
   push:
     branches:
-      - msa_dev # Triggers when code is merged into the msa_dev branch
+      - msa_staging # Triggers when code is merged into the msa_staging branch
 
 jobs:
   deploy-delta:
