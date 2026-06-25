@@ -1,11 +1,9 @@
-name: Deploy Delta Changes to Sandbox (Personal -> msa_dev)
+name: Deploy Delta Changes to Sandbox (msa_dev (dev org) -> msa_staging (UAT org))
 
 on:
   push:
     branches:
-      - msa_dev
-    paths:
-      - 'force-app/**' # Optimization: Only trigger if salesforce source files change
+      - msa_dev # Triggers when code is merged into the msa_dev branch
 
 jobs:
   deploy-delta:
@@ -15,113 +13,100 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Essential for git-delta tracking history
+          fetch-depth: 0
 
-      - name: Setup Node.js & Cache Dependencies
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm' # Speeds up runners if package-lock exists
 
-      # Pin versions for predictability across enterprise environments
-      - name: Install Salesforce CLI & Plugins
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
+
+      - name: Install sfdx-git-delta Plugin
         run: |
-          npm install -g @salesforce/cli@2.38.0
-          echo 'y' | sf plugins install sfdx-git-delta@latest
+          echo 'y' | sf plugins install sfdx-git-delta
 
-      - name: Authenticate to Salesforce Staging (JWT)
+      - name: Authenticate to Salesforce Dev (JWT) Org
         shell: bash
-        env:
-          JWT_KEY: ${{ secrets.JWT_SERVER_KEY }}
-          USERNAME: ${{ secrets.DEV_USERNAME }}
-          CLIENT_ID: ${{ secrets.DEV_CONSUMER_KEY }}
-          INSTANCE_URL: ${{ secrets.DEV_INSTANCE_URL || vars.DEV_INSTANCE_URL || 'https://test.salesforce.com' }}
         run: |
           set -euo pipefail
 
-          # Defensive checks for missing pipeline dependencies
-          if [ -z "$JWT_KEY" ] || [ -z "$USERNAME" ] || [ -z "$CLIENT_ID" ]; then
-            echo "::error::Missing required Salesforce authentication secrets."
+          if [ -z "${{ secrets.JWT_SERVER_KEY }}" ]; then
+            echo "ERROR: secrets.JWT_SERVER_KEY is not set" >&2
             exit 1
           fi
 
-          # Securely write key without leaky echoes
-          cat <<EOF > server.key
-          $JWT_KEY
-          EOF
-          chmod 600 server.key
-
-          sf org login jwt \
-            --username "$USERNAME" \
-            --jwt-key-file server.key \
-            --client-id "$CLIENT_ID" \
-            --instance-url "$INSTANCE_URL" \
-            --set-default \
-            --alias dev
-          
-          # Clean up key as soon as it's used
-          rm -f server.key
-
-      - name: Generate Delta Changes
-        id: delta
-        run: |
-          mkdir -p changed-sources
-
-          # Senior Fallback Logic: Handle fresh branches where github.event.before is 0000000000...
-          FROM_COMMIT="${{ github.event.before }}"
-          if [ "$FROM_COMMIT" = "0000000000000000000000000000000000000000" ] || [ -z "$FROM_COMMIT" ]; then
-            FROM_COMMIT="HEAD~1"
+          if [ -z "${{ secrets.DEV_USERNAME }}" ]; then
+            echo "ERROR: secrets.DEV_USERNAME is not set" >&2
+            exit 1
           fi
 
+          if [ -z "${{ secrets.DEV_CONSUMER_KEY }}" ]; then
+            echo "ERROR: secrets.DEV_CONSUMER_KEY is not set" >&2
+            exit 1
+          fi
+
+          echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
+          chmod 600 server.key
+
+          if [ -n "${{ secrets.DEV_INSTANCE_URL }}" ]; then
+            INSTANCE_URL_VALUE="${{ secrets.DEV_INSTANCE_URL }}"
+          else
+            INSTANCE_URL_VALUE="${{ vars.DEV_INSTANCE_URL }}"
+          fi
+
+          sf org login jwt \
+            --username "${{ secrets.DEV_USERNAME }}" \
+            --jwt-key-file server.key \
+            --client-id "${{ secrets.DEV_CONSUMER_KEY }}" \
+            --instance-url "${INSTANCE_URL_VALUE}" \
+            --set-default \
+            --alias Dev
+
+      - name: Generate Delta Changes
+        run: |
+          mkdir changed-sources
+
           sf sgd source delta \
-            --from "$FROM_COMMIT" \
-            --to "${{ github.sha }}" \
+            --from ${{ github.event.before }} \
+            --to ${{ github.sha }} \
             --output-dir changed-sources \
             --generate-delta \
             --source-dir force-app
 
-      # VALIDATE ONLY step that outputs a Job ID for Quick Deploy
-      - name: Validate Delta Deployment (Run Local Tests)
-        id: validate
+      - name: sf deploy validate
         run: |
-          if [ -f changed-sources/package/package.xml ] && grep -q "<types>" changed-sources/package/package.xml; then
-            echo "Changes detected. Validating deployment..."
-            
-            # Run validation and extract the job ID
-            VALIDATION_RESULT=$(sf project deploy validate \
+          sf project deploy validate \
+            --manifest changed-sources/package/package.xml \
+            --target-org Dev \
+            --test-level RunLocalTests
+
+      - name: Deploy Delta to Staging
+        if: github.event_name == 'push'
+        run: |
+          if grep -q "<types>" changed-sources/package/package.xml; then
+
+            sf project deploy start \
               --manifest changed-sources/package/package.xml \
-              --target-org dev \
-              --test-level RunRelevantTests \
-              --wait 45 \
-              --json)
-            
-            # Parse the Async Job ID using standard shell manipulation or jq if available
-            JOB_ID=$(echo "$VALIDATION_RESULT" | jq -r '.result.id')
-            echo "job_id=$JOB_ID" >> $GITHUB_OUTPUT
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+              --target-org Dev \
+              --test-level RunLocalTests \
+              --wait 30
+
           else
-            echo "No changed metadata detected."
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changed metadata detected to deploy."
           fi
 
-      # QUICK DEPLOY step (Runs instantly without re-running tests)
-      - name: Quick Deploy Delta to Staging
-        if: steps.validate.outputs.has_changes == 'true'
-        run: |
-          sf project deploy quick \
-            --job-id "${{ steps.validate.outputs.job_id }}" \
-            --target-org dev \
-            --wait 15
-
-      # Destructive changes are handled separately as SGD creates an isolated structural artifact
       - name: Deploy Destructive Changes
+        if: github.event_name == 'push'
         run: |
-          if [ -f changed-sources/destructiveChanges/destructiveChanges.xml ] && grep -q "<types>" changed-sources/destructiveChanges/destructiveChanges.xml; then
-            echo "Destructive changes detected. Deleting metadata..."
+          if [ -f changed-sources/destructiveChanges/destructiveChanges.xml ]; then
+
             sf project deploy start \
               --metadata-dir changed-sources/destructiveChanges \
-              --target-org dev \
+              --target-org Dev \
               --wait 30
+
           else
             echo "No deleted metadata detected."
           fi
