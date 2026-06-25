@@ -91,7 +91,7 @@ jobs:
             VALIDATION_RESULT=$(sf project deploy validate \
               --manifest changed-sources/package/package.xml \
               --target-org dev \
-              --test-level RunLocalTests \
+              --test-level RunRelevantTests \
               --wait 45 \
               --json)
             
