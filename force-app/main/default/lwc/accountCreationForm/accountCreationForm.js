@@ -57,7 +57,7 @@ export default class AccountCreationForm extends LightningElement {
         const input = this.template.querySelector('[data-id="phone"]');
         const digits = this.phone.replace(/\D/g, '');
         let errorMsg = '';
-
+  
         if (!this.phone.trim()) {
             errorMsg = 'Phone is required.';
         } else if (!PHONE_DIGIT_REGEX.test(digits)) {

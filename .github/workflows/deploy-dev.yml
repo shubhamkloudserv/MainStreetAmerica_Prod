@@ -84,14 +84,14 @@ jobs:
       - name: Validate Delta Deployment (Run Local Tests)
         id: validate
         run: |
-          if grep -q "<types>" changed-sources/package/package.xml; then
+          if [ -f changed-sources/package/package.xml ] && grep -q "<types>" changed-sources/package/package.xml; then
             echo "Changes detected. Validating deployment..."
             
             # Run validation and extract the job ID
             VALIDATION_RESULT=$(sf project deploy validate \
               --manifest changed-sources/package/package.xml \
               --target-org dev \
-              --test-level RunLocalTests \
+              --test-level RunRelevantTests \
               --wait 45 \
               --json)
             
