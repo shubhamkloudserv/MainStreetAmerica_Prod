@@ -30,7 +30,7 @@ jobs:
         run: |
           echo 'y' | sf plugins install sfdx-git-delta
 
-      # Step 5: Authenticate to the target Sandbox using JWT (no sfdx auth URL)
+      # Step 5: Authenticate to the target Sandbox using JWT
       - name: Authenticate to Salesforce Sandbox (JWT)
         shell: bash
         run: |
