@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Send_Acknowledgment_Email__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicates whether an acknowledgment email should be sent for the Gift Transaction.</description>
+    <inlineHelpText>Indicates whether an acknowledgment email should be sent for the Gift Transaction. Checked = Email Sent; Unchecked = Email Not Sent</inlineHelpText>
+    <label>Send Acknowledgment Email</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
