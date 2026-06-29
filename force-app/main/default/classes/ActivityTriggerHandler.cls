@@ -4,6 +4,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
     Set<Id> accountIds = new Set<Id>();
     Map<Id, Account> accMap = new Map<Id, Account>();
     Map<Id, Account> parentAccMap = new Map<Id, Account>();
+    System.debug('Initial Account Ids');
 
     // Collect account ids from Task
     public void collectAccountIdsFromTasks(List<Task> taskList){

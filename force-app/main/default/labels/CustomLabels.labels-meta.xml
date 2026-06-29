@@ -7,4 +7,11 @@
         <shortDescription>Membership_Activation_URL</shortDescription>
         <value>https://members.mainstreet.org/membership/activate?memberId=</value>
     </labels>
+    <labels>
+        <fullName>WebsiteIntegrationUserID</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Store Website Integration User ID</shortDescription>
+        <value>005aJ000008LlCDQA0</value>
+    </labels>
 </CustomLabels>
