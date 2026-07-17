@@ -1,0 +1,62 @@
+name: Claude PR Review (Gate 2 - AI First Pass) # Friendly name shown on GitHub.
+
+on: # WHEN it runs (the trigger):
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [msa_dev] # runs on the same PRs Gate 1 (validate-dev.yml) checks — in parallel, not in sequence.
+
+# Advisory only, by design (see ENGINEERING_AUTOMATION.md §7):
+# Claude is the thorough first-pass reviewer; a human stays the approver.
+# This job never fails/blocks the merge — only Gate 1 (validate-dev.yml) does that.
+permissions:
+  contents: read
+  pull-requests: write # to post the review comment
+  issues: write
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # 1. copy the PR's code onto it.
+        with:
+          fetch-depth: 0 # full history so Claude can see the diff against msa_dev, not just the tip commit.
+
+      - name: Fail fast if the API key secret is missing
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "ERROR: secrets.ANTHROPIC_API_KEY is not set. Add it under Settings -> Secrets and variables -> Actions." >&2
+            exit 1
+          fi
+
+      - name: Claude review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Read-only tools: this job reviews and comments, it must never edit PR files.
+          tools: "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*)"
+          direct_prompt: |
+            You are the automated first-pass reviewer for a Kloudserv Salesforce project
+            (see kloudserv-standards/ENGINEERING_PRACTICE.md and ENGINEERING_AUTOMATION.md).
+
+            Review the diff in this PR (compare against the `msa_dev` base branch) and post a
+            single PR review comment. Check specifically for:
+
+            1. Apex tests: every new/changed Apex method has a corresponding @isTest with real
+               System.assert statements (not empty tests that only inflate coverage).
+            2. Access changes: new access goes into Permission Sets, not Profiles.
+            3. Flows: record-triggered flows have `doesRequireRecordChangedToMeetCriteria` set
+               where relevant, and no obvious recursion risk (see the Order automation
+               consolidation precedent — multiple before-save automations updating the same
+               record is a recursion smell).
+            4. Environment-coupled values: no hardcoded record Ids, org-specific URLs, or
+               sandbox-only usernames in classes, flows, or custom labels.
+            5. Naming convention: commit messages / PR title reference a CASE-XXXX task id.
+            6. Anything that looks like a secret, credential, or `.key` file being committed —
+               flag this as a blocking concern above all else.
+
+            Structure your comment as: a plain-English summary first (what changed, overall
+            risk), then technical findings underneath, each with severity (Critical/Medium/Low),
+            file, and a suggested fix. This is advisory only — you are not approving or blocking
+            the PR; a human makes that call at Gate 2.
