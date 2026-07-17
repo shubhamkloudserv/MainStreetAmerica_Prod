@@ -21,6 +21,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
             if(e.WhatId != null && String.valueOf(e.WhatId).startsWith('001')){
                 accountIds.add(e.WhatId);
             }
+            System.debug(eventList);
         }
     }
 
