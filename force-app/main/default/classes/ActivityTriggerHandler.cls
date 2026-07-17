@@ -13,6 +13,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
                 accountIds.add(t.WhatId);
             }
         }
+        System.debug(taskList);
     }
 	// Collect account ids from Event
     public void collectAccountIdsFromEvents(List<Event> eventList){
