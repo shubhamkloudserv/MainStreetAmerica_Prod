@@ -36,8 +36,9 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           # Read-only tools: this job reviews and comments, it must never edit PR files.
-          allowed_tools: "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*)"
-          direct_prompt: |
+          claude_args: |
+            --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*)"
+          prompt: |
             You are the automated first-pass reviewer for a Kloudserv Salesforce project
             (see kloudserv-standards/ENGINEERING_PRACTICE.md and ENGINEERING_AUTOMATION.md).
 
