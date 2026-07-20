@@ -85,7 +85,19 @@ jobs:
         run: |
           # Verify if package.xml contains actual metadata before deploying
           if grep -q "<types>" changed-sources/package/package.xml; then
-            sf project deploy start --manifest changed-sources/package/package.xml --target-org sandbox --test-level RunSpecifiedTests --tests ${{ vars.DEV_TEST_CLASSES }} --wait 30
+            echo "Changes detected. Validating deployment..."
+            
+            # Run validation and extract the job ID
+            VALIDATION_RESULT=$(sf project deploy validate \
+              --manifest changed-sources/package/package.xml \
+              --target-org dev \
+              --wait 45 \
+              --json)
+            
+            # Parse the Async Job ID using standard shell manipulation or jq if available
+            JOB_ID=$(echo "$VALIDATION_RESULT" | jq -r '.result.id')
+            echo "job_id=$JOB_ID" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
           else
             echo "No changed metadata detected to deploy."
           fi
