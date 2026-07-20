@@ -1,64 +1,75 @@
-name: Claude PR Review (Gate 2 - AI First Pass) # Friendly name shown on GitHub.
+name: PR - Claude Code Review
 
-on: # WHEN it runs (the trigger):
+on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [msa_dev] # runs on the same PRs Gate 1 (validate-dev.yml) checks — in parallel, not in sequence.
+  issue_comment:
+    types: [created]
 
-# Advisory only, by design (see ENGINEERING_AUTOMATION.md §7):
-# Claude is the thorough first-pass reviewer; a human stays the approver.
-# This job never fails/blocks the merge — only Gate 1 (validate-dev.yml) does that.
+concurrency:
+  group: ${{ github.workflow }}-pr-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
-  pull-requests: write # to post the review comment
-  issues: write
-  id-token: write
+  pull-requests: write
+  issues: read
 
 jobs:
-  claude-review:
+  review:
+    # Run on PR events, or on issue comments that mention @claude
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@claude'))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # 1. copy the PR's code onto it.
+      - name: Checkout repository (PR event)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # full history so Claude can see the diff against msa_dev, not just the tip commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
-      - name: Fail fast if the API key secret is missing
-        shell: bash
+      - name: Checkout repository (issue_comment event)
+        if: github.event_name == 'issue_comment'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout PR branch (issue_comment event)
+        if: github.event_name == 'issue_comment'
+        env:
+          GH_TOKEN: ${{ secrets.TOKEN_GH }}
+        run: gh pr checkout ${{ github.event.issue.number }}
+
+      - name: Get PR base branch
+        id: pr-info
+        env:
+          GH_TOKEN: ${{ secrets.TOKEN_GH }}
         run: |
-          set -euo pipefail
-          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
-            echo "ERROR: secrets.ANTHROPIC_API_KEY is not set. Add it under Settings -> Secrets and variables -> Actions." >&2
-            exit 1
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "base_ref=${{ github.event.pull_request.base.ref }}" >> $GITHUB_OUTPUT
+          else
+            BASE_REF=$(gh pr view ${{ github.event.issue.number }} --json baseRefName -q '.baseRefName')
+            echo "base_ref=$BASE_REF" >> $GITHUB_OUTPUT
           fi
 
-      - name: Claude review
-        uses: anthropics/claude-code-action@v1
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # Read-only tools: this job reviews and comments, it must never edit PR files.
-          claude_args: |
-            --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*)"
+          model: claude-opus-4-5-20251101
+          timeout_minutes: 30
+          track_progress: true
           prompt: |
-            You are the automated first-pass reviewer for a Kloudserv Salesforce project
-            (see kloudserv-standards/ENGINEERING_PRACTICE.md and ENGINEERING_AUTOMATION.md).
+            Review this Pull Request using the standards in .claude/agents/code-reviewer.md
 
-            Review the diff in this PR (compare against the `msa_dev` base branch) and post a
-            single PR review comment. Check specifically for:
-
-            1. Apex tests: every new/changed Apex method has a corresponding @isTest with real
-               System.assert statements (not empty tests that only inflate coverage).
-            2. Access changes: new access goes into Permission Sets, not Profiles.
-            3. Flows: record-triggered flows have `doesRequireRecordChangedToMeetCriteria` set
-               where relevant, and no obvious recursion risk (see the Order automation
-               consolidation precedent — multiple before-save automations updating the same
-               record is a recursion smell).
-            4. Environment-coupled values: no hardcoded record Ids, org-specific URLs, or
-               sandbox-only usernames in classes, flows, or custom labels.
-            5. Naming convention: commit messages / PR title reference a CASE-XXXX task id.
-            6. Anything that looks like a secret, credential, or `.key` file being committed —
-               flag this as a blocking concern above all else.
-
-            Structure your comment as: a plain-English summary first (what changed, overall
-            risk), then technical findings underneath, each with severity (Critical/Medium/Low),
-            file, and a suggested fix. This is advisory only — you are not approving or blocking
-            the PR; a human makes that call at Gate 2.
+            1. Read .claude/agents/code-reviewer.md for the full checklist
+            2. Run `git diff origin/${{ steps.pr-info.outputs.base_ref }}...HEAD` to see changes
+            3. Apply the review checklist to modified files
+            4. Provide feedback organized by severity (Critical, Warning, Suggestion)
+          claude_args: |
+            --max-turns 10
+            --allowedTools "Read,Glob,Grep,Bash(git:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
