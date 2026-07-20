@@ -74,6 +74,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
       parentAccMap = new Map<Id, Account>(
         [SELECT Id, Primary_Contact__c FROM Account WHERE Id IN :parentIds]
       );
+      System.debug(parentAccMap);
     }
   }
 
