@@ -133,7 +133,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
       return;
 
     Account acc = accMap.get(e.WhatId);
-
+    System.debug('accounts');
     if (acc != null && acc.IsPersonAccount && acc.Parent_Account__c != null) {
       Account parentAcc = parentAccMap.get(acc.Parent_Account__c);
 
