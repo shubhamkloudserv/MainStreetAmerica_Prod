@@ -4,6 +4,9 @@ on: # WHEN it runs (the trigger):
   pull_request:
     branches: [main] # any PR targeting 'main' (production).
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest # rent a fresh Linux computer from GitHub.
