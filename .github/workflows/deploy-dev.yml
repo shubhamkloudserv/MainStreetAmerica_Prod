@@ -1,4 +1,4 @@
-name: Deploy Delta Changes to Sandbox (msa_dev (dev org) -> msa_staging (UAT org))
+name: Deploy Delta Changes to Dev (Personal -> msa_dev (dev org))
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Required for modern sf and SGD versions
+          node-version: "22" # Required for modern sf and SGD versions
 
       # Step 3: Install Salesforce CLI (sf v2)
       - name: Install Salesforce CLI
@@ -28,7 +28,7 @@ jobs:
       # Step 4: Install the sfdx-git-delta plugin
       - name: Install sfdx-git-delta Plugin
         run: |
-          echo 'y' | sf plugins install sfdx-git-delta
+          yes | sf plugins install sfdx-git-delta@latest
 
       # Step 5: Authenticate to the target Sandbox using JWT
       - name: Authenticate to Salesforce Sandbox (JWT)
@@ -66,7 +66,7 @@ jobs:
             --jwt-key-file server.key \
             --client-id "${{ secrets.DEV_CONSUMER_KEY }}" \
             --instance-url "${INSTANCE_URL_VALUE}" \
-            --set-default --alias sandbox
+            --set-default --alias dev
 
       # Step 6: Generate the delta metadata package
       - name: Generate Delta Changes
@@ -85,19 +85,7 @@ jobs:
         run: |
           # Verify if package.xml contains actual metadata before deploying
           if grep -q "<types>" changed-sources/package/package.xml; then
-            echo "Changes detected. Validating deployment..."
-            
-            # Run validation and extract the job ID
-            VALIDATION_RESULT=$(sf project deploy validate \
-              --manifest changed-sources/package/package.xml \
-              --target-org dev \
-              --wait 45 \
-              --json)
-            
-            # Parse the Async Job ID using standard shell manipulation or jq if available
-            JOB_ID=$(echo "$VALIDATION_RESULT" | jq -r '.result.id')
-            echo "job_id=$JOB_ID" >> $GITHUB_OUTPUT
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            sf project deploy start --manifest changed-sources/package/package.xml --target-org dev --test-level RunLocalTests --wait 30
           else
             echo "No changed metadata detected to deploy."
           fi
@@ -106,8 +94,7 @@ jobs:
       - name: Deploy Destructive Changes
         run: |
           if [ -f changed-sources/destructiveChanges/destructiveChanges.xml ]; then
-            sf project deploy start --metadata-dir changed-sources/destructiveChanges --target-org sandbox --wait 30
+            sf project deploy start --metadata-dir changed-sources/destructiveChanges --target-org dev --wait 30
           else
             echo "No deleted metadata detected."
           fi
-
