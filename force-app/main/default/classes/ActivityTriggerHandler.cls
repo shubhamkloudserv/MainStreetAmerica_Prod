@@ -122,6 +122,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
       ) {
         t.WhatId = acc.Parent_Account__c;
       }
+      System.debug('if condition executed');
     }
   }
 
