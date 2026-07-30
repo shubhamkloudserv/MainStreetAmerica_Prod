@@ -1,0 +1,98 @@
+name: PR Validation (Gate 1) # Friendly name shown on GitHub.
+
+on: # WHEN it runs (the trigger):
+  pull_request:
+    branches: [msa_staging] # any PR targeting 'staging'.
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest # rent a fresh Linux computer from GitHub.
+    steps:
+      - uses: actions/checkout@v4 # 1. copy the PR's code onto it.
+        with:
+          fetch-depth: 0 # need full git history so we can diff PR branch vs msa_staging.
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22" # Required for modern sf CLI versions
+
+      - run: npm install -g @salesforce/cli # 2. install the 'sf' tool.
+
+      - name: Install sfdx-git-delta plugin
+        run: echo y | sf plugins install sfdx-git-delta
+        # generates a package.xml containing only the metadata changed in this PR.
+
+      # Authenticate to the target Sandbox using JWT
+      - name: Authenticate to Salesforce Sandbox (JWT)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # fail fast if required secrets are missing
+          if [ -z "${{ secrets.JWT_SERVER_KEY }}" ]; then
+            echo "ERROR: secrets.JWT_SERVER_KEY is not set" >&2
+            exit 1
+          fi
+          if [ -z "${{ secrets.STAGING_USERNAME }}" ]; then
+            echo "ERROR: secrets.STAGING_USERNAME is not set" >&2
+            exit 1
+          fi
+          if [ -z "${{ secrets.STAGING_CONSUMER_KEY }}" ]; then
+            echo "ERROR: secrets.STAGING_CONSUMER_KEY is not set" >&2
+            exit 1
+          fi
+
+          # write private key to file with strict permissions
+          echo "${{ secrets.JWT_SERVER_KEY }}" > server.key
+          chmod 600 server.key
+
+          # prefer secret STAGING_INSTANCE_URL (if set), otherwise fall back to workflow var
+          if [ -n "${{ secrets.STAGING_INSTANCE_URL }}" ]; then
+            INSTANCE_URL_VALUE="${{ secrets.STAGING_INSTANCE_URL }}"
+          else
+            INSTANCE_URL_VALUE="${{ vars.STAGING_INSTANCE_URL }}"
+          fi
+
+          sf org login jwt \
+            --username "${{ secrets.STAGING_USERNAME }}" \
+            --jwt-key-file server.key \
+            --client-id "${{ secrets.STAGING_CONSUMER_KEY }}" \
+            --instance-url "${INSTANCE_URL_VALUE}" \
+            --set-default --alias staging
+        # 3. log in using the SECRET stored in GitHub settings (no password in the file).
+
+      - name: Generate delta package (changed metadata only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .deltaPackage
+
+          sf sgd source delta \
+            --to "HEAD" \
+            --from "origin/${{ github.base_ref }}" \
+            --output .deltaPackage \
+            --source force-app
+
+          echo "----- Delta package.xml -----"
+          cat .deltaPackage/package/package.xml
+
+      - name: Validate delta deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # if the delta only contains the empty <Package> wrapper, there's nothing to validate.
+          if ! grep -q "<members>" .deltaPackage/package/package.xml; then
+            echo "No metadata changes detected vs origin/${{ github.base_ref }} — skipping validation."
+            exit 0
+          fi
+
+          sf project deploy validate \
+            --manifest .deltaPackage/package/package.xml \
+            --test-level RunLocalTests \
+            --wait 30
+        # 4. the gate: check-only deploy of ONLY the changed metadata + run all Apex tests. Fails => PR red => merge blocked.
