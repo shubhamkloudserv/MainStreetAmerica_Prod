@@ -97,6 +97,7 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
   public void beforeUpdate(SObject oldSo, SObject so) {
     if (so instanceof Task) {
       Task t = (Task) so;
+      System.debug('Task update');
       updateTaskParent(t);
     } else if (so instanceof Event) {
       Event e = (Event) so;
