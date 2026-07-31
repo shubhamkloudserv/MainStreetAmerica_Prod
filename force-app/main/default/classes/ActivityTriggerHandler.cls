@@ -11,7 +11,6 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
         accountIds.add(t.WhatId);
       }
     }
-    System.debug(taskList);
   }
   // Collect account ids from Event
   public void collectAccountIdsFromEvents(List<Event> eventList) {
@@ -19,7 +18,6 @@ public with sharing class ActivityTriggerHandler implements TriggerInterface {
       if (e.WhatId != null && String.valueOf(e.WhatId).startsWith('001')) {
         accountIds.add(e.WhatId);
       }
-      System.debug(eventList);
     }
   }
 
